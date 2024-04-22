@@ -4,6 +4,9 @@ import DefaultTheme from 'vitepress/theme'
 
 import { createMediumZoomProvider } from './composables/useMediumZoom'
 
+import MNavVisitor from './components/MNavVisitor.vue'
+import MDocFooter from './components/MDocFooter.vue'
+import MAsideSponsors from './components/MAsideSponsors.vue'
 import MNavLinks from './components/MNavLinks.vue'
 
 import './styles/index.scss'
@@ -24,7 +27,7 @@ if (typeof window !== 'undefined') {
       return Promise.all(
         keyList.map(function (key) {
           return caches.delete(key)
-        }),
+        })
       )
     })
   }
@@ -50,6 +53,9 @@ export default {
        * https://vitepress.dev/guide/extending-default-theme#layout-slots
        * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/Layout.vue
        */
+      'nav-bar-title-after': () => h(MNavVisitor),
+      'doc-after': () => h(MDocFooter),
+      'aside-bottom': () => h(MAsideSponsors)
     })
   },
   enhanceApp({ app, router }: EnhanceAppContext) {
@@ -63,10 +69,10 @@ export default {
       watch(
         () => router.route.data.relativePath,
         () => updateHomePageStyle(location.pathname === '/'),
-        { immediate: true },
+        { immediate: true }
       )
     }
-  },
+  }
 }
 
 if (typeof window !== 'undefined') {
