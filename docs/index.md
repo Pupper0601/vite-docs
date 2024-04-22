@@ -8,31 +8,28 @@ hero:
   tagline: 知识是进步的阶梯，争取每天都有知识点更新
   image:
     src: https://img.pupper.cn/img/1710229767.gif
-    alt: 茂茂物语
+    alt: 码无止境
   actions:
     - text: 前端物语
-      link: /fe/es6/
-    - text: 前端导航
+      link: /100-Python/1-对象与变量
+    - text: 导航
       link: /nav
-      theme: alt
-    - text: mmPlayer
-      link: https://netease-music.fe-mm.com
       theme: alt
 features:
   - icon: 📖
     title: 前端物语
-    details: 整理前端常用知识点<small>（面试八股文）</small><br />如有异议按你的理解为主，不接受反驳
-    link: /fe/javascript/types
+    details: 整理前端常用知识点<br />如有异议按你的理解为主，不接受反驳
+    link: /410-HTML/3-常用标签详解
     linkText: 前端常用知识
   - icon: 📘
-    title: 源码阅读
-    details: 了解各种库的实现原理<br />学习其中的小技巧和冷知识
-    link: /analysis/utils/only-allow
+    title: 自动化
+    details: 测试常用的 接口、web、app 等自动化技术
+    link: /210-接口自动化/1-HTTP协议解读
     linkText: 源码阅读
   - icon: 💡
-    title: Workflow
+    title: 零散的知识
     details: 在工作中学到的一切<small>（常用库/工具/奇淫技巧等）</small><br />配合 CV 大法来更好的摸鱼
-    link: /workflow/utils/library
+    link: /700-零散知识/1-MAC中Jmeter向python脚本传参
     linkText: 常用工具库
   # - icon: 🧰
   #   title: 提效工具
