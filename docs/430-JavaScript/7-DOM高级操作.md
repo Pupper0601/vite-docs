@@ -1,0 +1,603 @@
+---
+title: JavaScript - DOM 高级操作
+categories:
+  - 学习笔记
+  - 前端基础
+tags:
+  - JavaScript
+abbrlink: 616d77ed
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-16.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#c3ccd2'
+---
+
+## 一、注册事件的方式
+
+### 1. 传统方式
+
+利用 on 开头的事件，如： onclick
+
+特点：唯一性
+
+- 同一个元素同一个事件只能注册一个处理函数
+
+### 2. 方法监听 方式（`addEventListener()`)
+
+> `addEventListener()` ie9 以上支持，ie9 以下可以用 `attachEvent()` 来代替
+
+特点：
+
+- 同一个元素同一事件可以注册多个监听处理函数
+
+语法：
+
+```js
+eventTarget.addEventListener(type, listener[, useCapture])
+```
+
+- `eventTarget.addEventListener()` 方法将指定的监听函数注册到 `eventTarget（目标对象）`上，当该对象触发指定事件时，就会执行事件处理函数。
+- `type` ： 事件类型 **字符串**，比如 click、mouseover，注意这里不要带 on
+- `listener` ： 事件处理函数，事件发出时，会调用该监听函数
+- `useCapture` ： 可选参数，是一个布尔值，默认为 false（冒泡阶段），为 true（捕获阶段）
+
+```HTML
+<div class="demo">
+    <button>方法监听事件1</button>
+    <button>方法监听事件2</button>
+</div>
+
+<script>
+    var buts = document.querySelectorAll('button');
+    buts[1].addEventListener('click', function () {
+        alert('注册事件1');
+    })
+    buts[1].addEventListener('click', function () {
+        alert('注册事件2');
+    })
+</script>
+```
+
+## 二、 删除事件
+
+### 1. 传统方法
+
+```js
+enentTarget.onclick = null
+```
+
+```html
+<div class="demo">
+  <div>删除事件1</div>
+  <div>删除事件2</div>
+  <div>删除事件3</div>
+</div>
+
+<script>
+  var divs = document.querySelector('.demo').querySelectorAll('div')
+  divs[0].onclick = function () {
+    alert('删除弹框事件')
+    this.onclick = null
+  }
+</script>
+```
+
+### 2. 方法监听
+
+```js
+eventTarget.removeEventListener(type, listener[, useCapture]);
+```
+
+注意：
+
+- 在调用方法时，函数名后不用添加小括号
+
+```html
+<div class="demo">
+    <div>删除事件-传统方式</div>
+    <div>删除事件-监听方式</div>
+</div>
+
+<script>
+    var divs = document.querySelector('.demo').querySelectorAll('div');
+    divs[0].onclick = function(){
+        alert('删除弹框事件');
+        this.onclick = null;
+    }
+    // 调用的方法不用加小括号
+    divs[1].addEventListener('click', fn);
+
+    function fn(){
+        alert('删除弹框事件1');
+        divs[1].removeEventListener('click', fn);
+    }
+```
+
+## 三、 DOM 事件流
+
+> DOM 事件流：就是事件传播的顺序
+
+JS 事件流 只能执行 捕获 或者 冒泡 其中的一个阶段：
+
+- 捕获阶段：
+  - 事件执行顺序：document > html > body > father > son
+- 冒泡阶段：
+  - 事件执行顺序：son > father > body > html > document
+
+注意：
+
+- `onclick` 和 `attachEvent` 只能得到 冒泡阶段
+- `onblur 、 onfocus 、 onmousenter 、 onmouseleave` 没有冒泡阶段
+
+```HTML
+<div class="father">
+    <div class="son">son 盒子</div>
+</div>
+
+<script>
+    var father = document.querySelector('.father');
+    var son = document.querySelector('.son');
+    // addEventListener 的参数 useCapture 为 true 则是捕获阶段，默认为 false，冒泡阶段
+    // 捕获阶段 --- 先出现 father 弹框，再出现 son 弹框
+    father.addEventListener('click', function () {
+        alert('father')
+    }, true)
+    son.addEventListener('click', function () {
+        alert('son')
+    }, true)
+
+    // 冒泡阶段 --- 先出现  弹框，再出现 father 弹框
+    father.addEventListener('click', function () {
+        alert('father')
+    })
+    son.addEventListener('click', function () {
+        alert('son')
+    })
+</script>
+```
+
+## 四、 事件对象
+
+> 事件对象 ： 事件发生后，一系列和事件相关的数据存储的集合对象
+
+```js
+eventTarget.onclick = function (event) {}
+
+eventTarget.addEventListener('click', function () {})
+```
+
+`event` 就是时间对象，也可以写成 e 或者 evt，兼容 ie9 以上浏览器
+
+`event` 是一个形参，不需要传递实参进去， 是系统自动创建的
+
+### 1. 事件对象的属性和方法
+
+| 时间对象属性方法    | 说明                                                   |
+| ------------------- | ------------------------------------------------------ |
+| e.target            | 返回 触发 事件的对象                                   |
+| e.type              | 返回时间的类型                                         |
+| e.prevetDefault()   | 该方法阻止默认事件（默认行为） 标准，比如 不让连接跳转 |
+| e.stopPropagation() | 阻止冒泡标准                                           |
+
+注意：
+
+- `this` ： 返回的是绑定事件的对象
+- `target` ： 返回的是触发事件的对象
+
+```HTML
+<div>123</div>
+<ul>
+    <li>abc</li>
+    <li>abc</li>
+    <li>abc</li>
+</ul>
+<script>
+    // 常见事件对象的属性和方法
+    // 1. e.target 返回的是触发事件的对象（元素）  this 返回的是绑定事件的对象（元素）
+    // 区别 ： e.target 点击了那个元素，就返回那个元素 this 那个元素绑定了这个点击事件，那么就返回谁
+    var ul = document.querySelector('ul');
+    ul.addEventListener('click', function (e) {
+        // 我们给ul 绑定了事件  那么this 就指向ul
+        console.log(this);
+
+        // e.target 指向我们点击的那个对象 谁触发了这个事件 我们点击的是li e.target 指向的就是li
+        console.log(e.target);
+    })
+</script>
+```
+
+阻止默认事件：
+
+```HTML
+<div>123</div>
+<a href="http://www.baidu.com">百度</a>
+<form action="http://www.baidu.com">
+    <input type="submit" value="提交" name="sub">
+</form>
+<script>
+    // 常见事件对象的属性和方法
+    // 1. 返回事件类型
+    var div = document.querySelector('div');
+    div.addEventListener('click', fn);
+    div.addEventListener('mouseover', fn);
+    div.addEventListener('mouseout', fn);
+
+    function fn(e) {
+        console.log(e.type);
+    }
+    // 2. 阻止默认行为（事件） 让链接不跳转 或者让提交按钮不提交
+    var a = document.querySelector('a');
+    a.addEventListener('click', function(e) {
+        e.preventDefault(); //  dom 标准写法
+    })
+    // 3. 传统的注册方式
+    a.onclick = function(e) {
+        // 普通浏览器 e.preventDefault();
+        e.preventDefault();
+        // return false 也能阻止默认行为
+        // 特点： return 后面的代码不执行了， 而且只限于传统的注册方式
+        return false;
+        alert(11);
+    }
+</script>
+```
+
+### 2. 阻止冒泡 `stopPropagation()`
+
+语法：
+
+```js
+e.stopPropagation()
+```
+
+需要阻止那个元素冒泡，就在那个元素方法中添加 `e.stopPropagation();`
+
+```HTML
+ <div class="father">
+     <div class="son">son儿子</div>
+</div>
+<script>
+    // 阻止冒泡  dom 推荐的标准 stopPropagation()
+    var son = document.querySelector('.son');
+    son.addEventListener('click', function (e) {
+        alert('son');
+        e.stopPropagation(); // stop 停止  Propagation 传播
+    });
+
+    var father = document.querySelector('.father');
+    father.addEventListener('click', function () {
+        alert('father');
+    });
+    document.addEventListener('click', function () {
+        alert('document');
+    })
+</script>
+```
+
+### 3. 事件委托
+
+> 事件委托： 不是每个子节点单独设置事件监听器，而是事件监听器设置在其父节点上，然后利用冒泡原理影响设置每个子节点
+
+```HTML
+<ul>
+    <li>知否知否，点我应有弹框在手！</li>
+    <li>知否知否，点我应有弹框在手！</li>
+    <li>知否知否，点我应有弹框在手！</li>
+    <li>知否知否，点我应有弹框在手！</li>
+    <li>知否知否，点我应有弹框在手！</li>
+</ul>
+<script>
+    // 事件委托的核心原理：给父节点添加侦听器， 利用事件冒泡影响每一个子节点
+    var ul = document.querySelector('ul');
+    ul.addEventListener('click', function(e) {
+        alert('知否知否，点我应有弹框在手！');
+
+        // e.target 这个可以得到我们点击的对象
+        e.target.style.backgroundColor = 'pink';
+    })
+</script>
+```
+
+## 五、 常用 鼠标、键盘 事件
+
+### 1. 鼠标事件
+
+| 鼠标事件    | 触发条件         |
+| ----------- | ---------------- |
+| onclick     | 鼠标左键点击触发 |
+| onmouseover | 鼠标经过         |
+| onmouseout  | 鼠标离开         |
+| onfocus     | 获取鼠标焦点     |
+| onblur      | 失去鼠标焦点     |
+| onmousemove | 鼠标移动         |
+| onmouseup   | 鼠标弹起         |
+| onmousedown | 鼠标按下         |
+| contextmenu | 禁止鼠标右键菜单 |
+| selectstart | 禁止鼠标选中     |
+
+禁用整个网页的鼠标右键菜单：
+
+```js
+document.addEventListener('contextmenu', function (e) {
+  e.preventDefault()
+})
+```
+
+禁止鼠标选中文字：
+
+```js
+document.addEventListener('selectstart', function (e) {
+  e.preventDefault()
+})
+```
+
+### 2. 鼠标事件对象 `（MouseEvent）`
+
+| 鼠标事件对象 | 说明                                      |
+| ------------ | ----------------------------------------- |
+| e.clientX    | 返回鼠标相对于 浏览器窗口 可视区的 X 坐标 |
+| e.clientY    | 返回鼠标相对于 浏览器窗口 可视区的 Y 坐标 |
+| e.pageX      | 返回鼠标相对于 文档页面的 X 坐标          |
+| e.pageY      | 返回鼠标相对于 文档页面的 Y 坐标          |
+| e.screenX    | 返回鼠标相对于 电脑屏幕的 X 坐标          |
+| e.screenY    | 返回鼠标相对于 电脑屏幕的 Y 坐标          |
+
+<iframe height="400" style="width: 100%;" scrolling="no" title="小天使" src="https://animpen.com/embed/-d7qvp?tab=html,rlt" frameborder="no"  allowtransparency="true" allowfullscreen="true"></iframe>
+
+::: details
+
+```HTML
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Document</title>
+	<style>
+		.ts {
+			position: absolute;
+			width: 40px;
+		}
+	</style>
+</head>
+
+<body>
+	<img src="https://img.pupper.cn/img/202112211755139.gif" alt="" class="ts">
+
+	<script>
+		var ts = document.querySelector('.ts')
+		document.addEventListener('mousemove', function(e){
+			ts.style.left = e.clientX - 15 + "px";
+			ts.style.top = e.clientY - 15 + "px";
+		})
+
+	</script>
+</body>
+
+</html>
+```
+
+:::
+
+### 3. 键盘事件
+
+| 键盘事件   | 触发条件                                                                |
+| ---------- | ----------------------------------------------------------------------- |
+| onkeyup    | 某个按键松开时触发                                                      |
+| onkeydown  | 某个按键按下时触发                                                      |
+| onkeypress | 某个按键按下时触发，但是不识别功能键，<br />如： ctrl 、 shift 、箭头等 |
+
+注意：
+
+- 执行顺序： keydown ---> keypress ---> keyup
+- keypress 不识别功能键
+
+```JS
+document.addEventListener('keyup', function () {
+    console.log('按键弹起了');
+})
+document.addEventListener('keydown', function () {
+    console.log('按键按下了');
+})
+document.addEventListener('keypress', function () {
+    console.log('按的不是功能键');
+})
+```
+
+### 4. 键盘事件对象
+
+::: note
+
+- `keyup` 和 `keydown` 获取的 KeyCode 不区分大小写字母
+- `keypress` 获取的 KeyCode 区分大小写字母 ，但是不识别 键盘 功能键
+
+:::
+
+```JS
+// 大写字母 A
+document.addEventListener('keyup', function (e) {
+    console.log(e.keyCode);		// 97
+})
+document.addEventListener('keypress', function (e) {
+    console.log(e.keyCode);		// 65
+})
+```
+
+### 案例 -- 按 S 输入框获取焦点
+
+<iframe height="400" style="width: 100%;" scrolling="no" title="输入框自动获取焦点" src="https://animpen.com/embed/56pVg0?tab=html,rlt" frameborder="no"  allowtransparency="true" allowfullscreen="true"></iframe>
+
+::: details
+
+```HTML
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+		.demo {
+			width: 240px;
+			height: 25px;
+			margin: 50px auto;
+		}
+		.demo input {
+			float: left;
+			width: 200px;
+			height: 25px;
+			border: 1px solid saddlebrown;
+			outline: none;
+			padding: 0 10px 0 10px;
+		}
+		.demo button {
+			height: 25px;
+			width: 40px;
+			border: none;
+			background-color: saddlebrown;
+			color: #fff;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="demo">
+		<input type="text">
+		<button>搜索</button>
+	</div>
+
+	<script>
+		var inp = document.querySelector('input');
+		var but = document.querySelector('button');
+		document.addEventListener('keyup', function(e){
+			if(e.keyCode == 83){
+				inp.focus();
+			}
+		})
+	</script>
+</body>
+</html>
+```
+
+:::
+
+### 案例 --- 输入框输入内容，显示大文字
+
+<iframe height="500" style="width: 100%;" scrolling="no" title="输入框输入内容，显示大文字" src="https://animpen.com/embed/18kIhz?tab=rlt,html" frameborder="no"  allowtransparency="true" allowfullscreen="true"></iframe>
+
+::: details
+
+```HTML
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+	<title>Document</title>
+	<style>
+		* {
+			margin: 0;
+			padding: 0;
+			box-sizing: border-box;
+		}
+
+		.demo {
+			position: relative;
+			width: 240px;
+			height: 25px;
+			margin: 200px auto;
+		}
+
+		.demo input {
+			float: left;
+			width: 200px;
+			height: 25px;
+			border: 1px solid saddlebrown;
+			outline: none;
+			padding: 0 10px 0 10px;
+		}
+
+		.demo button {
+			height: 25px;
+			width: 40px;
+			border: none;
+			background-color: saddlebrown;
+			color: #fff;
+		}
+
+		.big {
+			display: none;
+			position: absolute;
+			top: -40px;
+			width: 200px;
+			height: 30px;
+			border: 1px solid rgba(0, 0, 0, .2);
+			box-shadow: 0 2px 4px rgba(0, 0, 0, .2);
+			padding: 5px 0;
+			font-size: 18px;
+			line-height: 20px;
+			color: #333;
+		}
+
+		.big::before {
+			content: '';
+			width: 0;
+			height: 0;
+			position: absolute;
+			top: 28px;
+			left: 18px;
+			border: 8px solid #000;
+			border-style: solid dashed dashed;
+			border-color: rgb(255, 255, 255) transparent transparent;
+		}
+	</style>
+</head>
+
+<body>
+	<div class="demo">
+		<input type="text">
+		<button>搜索</button>
+		<div class="big"></div>
+	</div>
+
+	<script>
+		var inp = document.querySelector('.demo').querySelector('input');
+		var big = document.querySelector('.big');
+		// 输入内容就显示，为空就不显示
+		inp.addEventListener('keyup', function (e) {
+			if (this.value != '') {
+				big.style.display = 'block';
+				big.innerHTML = this.value;
+			} else {
+				big.style.display = 'none';
+			}
+		})
+		//  获得焦点，不为空是显示
+		inp.addEventListener('focus', function (e) {
+			if (this.value != '') {
+				big.style.display = 'block';
+			}
+		})
+		// 失去焦点，不显示
+		inp.addEventListener('blur', function (e) {
+			big.style.display = 'none';
+		})
+	</script>
+</body>
+
+</html>
+```
+
+:::

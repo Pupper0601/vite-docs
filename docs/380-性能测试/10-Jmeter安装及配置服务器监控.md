@@ -1,0 +1,234 @@
+---
+title: 性能测试 - jmeter 安装及配置服务器监控
+categories:
+  - 学习笔记
+  - 软件测试
+tags:
+  - 性能测试
+  - jmeter
+abbrlink: f5e44a42
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-14.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#658384'
+---
+
+## 一. JAVA 环境配置
+
+### 1. 验证 Java 环境是否安装
+
+```sh
+java --version
+```
+
+![](https://img.pupper.cn/img/20220802104141.png)
+
+### 2.MAC JAVA 安装
+
+[JAVA 官网下载地址](https://www.oracle.com/java/technologies/downloads/#java11-mac) https://www.oracle.com/java/technologies/downloads/#java11-mac
+![](https://img.pupper.cn/img/20220802105211.png)
+
+![](https://img.pupper.cn/img/20220802105617.png)
+
+```sh
+# 查看 Java 是否安装成功
+java --version
+
+# 查看 Java 安装路径
+/usr/libexec/java_home -V
+```
+
+![](https://img.pupper.cn/img/20220802110426.png)
+
+### 3.环境配置
+
+::: tip
+第一次配置环境变量，需要创建一个 `.bash_profil` 的隐藏配置文件
+:::
+
+```sh
+touch .bash_profile
+```
+
+使用一下命令打开配置文件
+
+```sh
+open -e .bash_profile
+```
+
+在配置文件中输入一下环境变量
+::: warning
+JAVA_HOME 的地址需要更换为 上一步 查找的地址
+:::
+
+```bash
+JAVA_HOME="/Library/Java/JavaVirtualMachines/jdk-11.0.14.jdk/Contents/Home"
+CLASS_PATH="$JAVA_HOME/lib"
+PATH=".$PATH:$JAVA_HOME/bin"
+export JAVA_HOME
+export PATH
+export CLASS_PATH
+```
+
+保存关闭文件后, 在 终端 输入一下代码, 重新加载配置文件
+
+```sh
+source .bash_profile
+```
+
+在 终端 输入 `echo $JAVA_HOME` ,消失路径则表示 配置完成
+
+```sh
+echo $JAVA_HOME
+```
+
+![](https://img.pupper.cn/img/20220802112532.png)
+
+## 二. Jmeter 安装
+
+### 1. 下载 Jmeter
+
+[jmeter 官网下载地址](https://jmeter.apache.org/download_jmeter.cgi)
+![](https://img.pupper.cn/img/20220802114515.png)
+
+将下载的 压缩包 解压
+![](https://img.pupper.cn/img/20220802115005.png)
+
+### 2. 配置 Jmeter
+
+打开配置文件, 将以下代码添加到配置文件中
+
+```sh
+open -e .bash_profile
+```
+
+::: warning
+JMETER_HOME 的路径为 你解压的 jmeter 路径
+:::
+
+```bash
+export JMETER_HOME=/Users/chengqiande/Applications/apache-jmeter-5.5
+export PATH=$JAVA_HOME/bin:$PATH:.:$JMETER_HOME/bin:$PATH
+export CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar:$JMETER_HOME/lib/ext/ApacheJMeter_core.jar:$JMETER_HOME/lib/jorphan.jar:$JMETER_HOME/lib/logkit-2.0.jar
+```
+
+保存关闭配置文件,使用 `source .bash_profile` 重新加载配置文件
+
+在 终端中输入 `jmeter` 即可开启 jmeter 程序
+![](https://img.pupper.cn/img/20220802115757.png)
+![](https://img.pupper.cn/img/20220802115814.png)
+
+### 3. jmeter 语言更改
+
+在 jmeter 目录中的 bin 文件夹中 找到 `jmeter.properties` 文件, 使用 记事本打开
+![](https://img.pupper.cn/img/20220802115923.png)
+
+查找 `language` 关键字,然后添加如下代码
+
+```properties
+language=zh_CN
+```
+
+![](https://img.pupper.cn/img/20220802120525.png)
+
+保存关闭文件,重启 jmeter 即可为中文
+
+![](https://img.pupper.cn/img/20220802120637.png)
+
+## 三.插件管理器 安装
+
+[插件管理器 - 下载地址](https://jmeter-plugins.org/install/Install/)
+
+::: theorem VuePress
+下载 plugins-manager.jar 并放入 lib/ext 目录，然后重启 JMeter。
+::: right
+来自 [jmeter-plugins 官网](https://jmeter-plugins.org/install/Install/)
+:::
+
+![](https://img.pupper.cn/img/20220802144222.png)
+![](https://img.pupper.cn/img/20220802144726.png)
+重启 jmeter 后, 在 **选项** 菜单中会出现 **Plugins Manager** 选项
+![](https://img.pupper.cn/img/20220802144916.png)
+
+## 四. jmeter 插件 安装
+
+打开插件管理器, 在 **Available Plugins** 中搜索 `Standard Set` 进行安装, 安装插件后会 自动重启
+
+![](https://img.pupper.cn/img/20220802164240.png)
+
+点击线程即可添加 监控
+![](https://img.pupper.cn/img/20220802164911.png)
+
+## 五. 服务器监控 插件
+
+### 1. 安装插件
+
+[下载 ServerAgent 文件](https://github.com/undera/perfmon-agent/releases/tag/2.2.3)
+
+#### 在服务器中创建 jmeter 文件夹, 将 ServerAgent 压缩包上传到文件夹下
+
+![](https://img.pupper.cn/img/20220804094513.png)
+
+#### 使用以下命令将 ServerAgent 压缩包 解压
+
+```sh
+unzip ServerAgent-2.2.3.zip
+```
+
+![](https://img.pupper.cn/img/20220804094824.png)
+
+#### 修改 ServerAgent-2.2.3 文件夹 权限
+
+```sh
+chmod 777 ServerAgent-2.2.3
+```
+
+![](https://img.pupper.cn/img/20220804095351.png)
+
+### 2. 运行服务
+
+#### 查看 4444 端口是否被占用
+
+```sh
+lsof -i:4444
+```
+
+#### 修改 startAgent 端口
+
+```sh
+./startAgent.sh --tcp-port 9501 --udp-port 9501 --sysinfo
+```
+
+#### 修改 `startAgent.sh` 运行脚本
+
+::: tip
+在脚本末尾添加 `&` 符号, 使脚本可以后台运行
+
+- `vi startAgent.sh` 打开脚本
+- `:wq` 保存脚本并退出
+  :::
+
+```sh
+java -jar $(dirname $0)/CMDRunner.jar --tool PerfMonAgent "$@" &
+```
+
+#### 运行脚本
+
+```sh
+./startAgent.sh
+```
+
+#### 查看服务是否允许
+
+```sh
+ps -aux|grep CMD
+```
+
+![](https://img.pupper.cn/img/20220804173804.png)
+
+## 六. jmeter 连接 服务器监控
+
+![](https://img.pupper.cn/img/20220804174328.png)
+
+![](https://img.pupper.cn/img/20220804174237.png)

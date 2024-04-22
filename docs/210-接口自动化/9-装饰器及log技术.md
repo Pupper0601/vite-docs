@@ -1,0 +1,206 @@
+---
+title: 9、接口测试 - 装饰器及 log 技术
+categories:
+  - 学习笔记
+  - 软件测试
+tags:
+  - 接口测试
+abbrlink: 730ac3f9
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-43.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#6a8888'
+---
+
+## 一、装饰器
+
+- `装饰器本质`：一个`函数`，该函数用来处理其他函数，使其他函数在不修改代码前提下**增加额外的功能**
+
+  - 装饰器的返回值可以是一个**函数对象**。
+
+- 使用场景：插入日志，事务处理，缓存，权限校验等
+
+- 可以抽离出大量与函数功能本身无关的雷同代码，并且可以继续复用
+
+### 装饰器的使用
+
+**该测试用例执行，服务器的响应时间是多少，我们怎么实现该代码**？
+
+```python
+def foo():
+    print('执行测试用例')
+    time.sleep(1）
+```
+
+### 1. 实现
+
+```python
+# 自动化测试场景
+import time
+def foo():
+    print('执行测试用例')
+    time.sleep(1)
+
+def show_time(func):
+	start_time = time.time() # 开始时间
+	func() # 函数调用
+	end_time = time.time() # 结束时间
+	print('服务器响应时间: ',end_timestart_time)
+
+show_time(foo)
+```
+
+### 2. 使用 - 装饰器方案改造
+
+```python
+import time
+def show_time(func):
+    def inner():
+        start_time = time.time() # 开始时间
+        func() # 函数调用
+        end_time = time.time() # 结束时间
+        print('服务器响应时间: ',end_timestart_time)
+        return inner # 返回函数对象
+
+def foo():
+	print('执行测试用例')
+	time.sleep(1)
+
+foo=show_time(foo)
+foo()
+```
+
+- foo=show_time(foo) foo()
+- 但是每次执行一次都得重新赋值一次，麻烦，不够优雅
+- python 针对这个情况，提供一个完美的解决方案：`语法糖 @`
+
+```python
+# 自动化测试场景
+import time
+
+def show_time(func):
+    def inner():
+        start_time = time.time() # 开始时间
+        func() # 函数调用
+        end_time = time.time() # 结束时间
+        print('服务器响应时间: ',end_timestart_time)
+        return inner # 返回函数对象
+
+@show_time # 语法糖 等价 foo=show_time(foo)
+def foo():
+	print('执行测试用例')
+	time.sleep(1)
+
+foo()
+
+
+#输出结果
+执行测试用例
+服务器响应时间: 1.0
+```
+
+### 3. 带参数的函数装饰器
+
+```python
+# 自动化测试场景
+import time
+
+def some_body_run(name):
+    def show_time(func):
+        def inner():
+            start_time = time.time() # 开始时间
+            func()#函数调用
+            end_time = time.time() # 结束时间
+            print('服务器响应时间:',end_time-start_time)
+            print('执行者：',name)
+        return inner # 返回函数对象
+    return show_time
+
+@some_body_run('tom') # 语法糖 等价 foo=some_body_run('tom')
+def foo():
+	print('执行测试用例')
+	time.sleep(1)
+
+foo()
+
+
+# 输出结果
+执行测试用例
+服务器响应时间: 1.0
+执行者： tom
+```
+
+## 二、 log 技术
+
+### 1. 日志级别
+
+Fatal -> Error -> Warning -> Info -> Debug
+
+| 级别       | 描述                                                               |
+| ---------- | ------------------------------------------------------------------ |
+| `DEBUG`    | 细节信息，仅当诊断问题时适用。                                     |
+| `INFO`     | 确认程序按预期运行                                                 |
+| `WARNING`  | 表明有已经或即将发生的意外（例如：磁盘空间不足）。程序仍按预期进行 |
+| `ERROR`    | 由于严重的问题，程序的某些功能已经不能正常执行                     |
+| `CRITICAL` | 严重的错误，表明程序已不能继续执行                                 |
+
+```python
+def logger():
+    '''
+    logging.basicConfig函数各参数：
+    filename：指定日志文件名；
+    filemode：和file函数意义相同，指定日志文件的打开模式，'w'或者'a'；
+    format：指定输出的格式和内容，format可以输出很多有用的信息，
+    level logging.INFO,
+    '''
+    # 调用配置函数
+    logging.basicConfig(format='%(asctime)s - %(filename)s[line:%(lineno)d] - %(levelname)s:%(message)s',
+                        filename=f'../logs/{datetime.datetime.now().strftime("%Y_%m_%d %H-%M-%S")}.log',
+                        level=logging.INFO,
+                        filemode='a'
+                        )
+    return logging
+```
+
+- `logging.basicConfig` : 函数各参数
+- `filename` ： 指定日志文件名
+- `level` ： 监控级别
+- `filemode` ： 和 file 函数意义相同，指定日志文件的打开模式， “w” 或者 “a”
+- `format` ： 指定输出的格式和内容，format 可以输出很多有用的信息
+
+| 参数            | 作用                                          |
+| --------------- | --------------------------------------------- |
+| %(levelno)s     | 打印日志级别的数值                            |
+| %(levelname)s   | 打印日志级别的名称                            |
+| %(pathname)s    | 打印当前执行程序的路径，其实就 是 sys.argv[0] |
+| %(filename)s    | 打印当前执行程序名                            |
+| %(funcName)s    | 打印日志的当前函数                            |
+| %(lineno)d      | 打印日志的当前行号                            |
+| %(asctime)s     | 打印日志的时间                                |
+| %(thread)d      | 打印线程 ID                                   |
+| % (threadName)s | 打印线程名称                                  |
+| %(process)d     | 打印进程 ID                                   |
+
+代码调用：
+
+```python
+from tools.logBasic import logger
+
+log = logger()  # 调用自定义封装的log函数
+
+class TestLogin:
+    # [({},{}),({},{})]
+    @pytest.mark.parametrize('inData,respData', get_yaml_data('../data/data.yaml'))
+    def test_login(self, inData, respData):
+        # 1- 调用--封装模块
+        res = Login().login(inData, getToken=False)
+        print(res)
+        log.info('------##############------------')
+        # 2- 断言  实际结果与预期的结果进行比较
+        try:
+            assert res['msg'] == respData['msg']
+        except Exception as err:
+            log.error(err)
+            raise err  # 抛出异常
+```

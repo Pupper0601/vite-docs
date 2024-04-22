@@ -1,0 +1,527 @@
+---
+title: 8、接口测试 - Mock 技术
+categories:
+  - 学习笔记
+  - 软件测试
+tags:
+  - 接口测试
+abbrlink: e8c9944b
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-302.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#688585'
+---
+
+## 一、Mock 技术
+
+### 1. 使用场景
+
+- 第一个后端没有开发好，自动化测试的脚本需要提前开发与调试可以使用 mock 技术
+- 提供执行效率：调用第 3 方接口---响应特别的长（有不稳定的情况）--10s----在自动化脚本调试的前期
+
+### 2. 实现方案
+
+- 自己开发一个后端---使用 django flask---对于一般的测试人员有很大的挑战！
+- 使用 `moco` 框架 减轻测试人员的开发的成本
+
+## 二、 Mock 服务搭建（moco 框架）
+
+### 1. moco 框架
+
+实现 mock 的技术可以分为两类，mock 数据和 mock 服务：
+
+- `mock数据`：即 mock 一个对象，写入一些预期的值，通过它进行自己想要的测试。
+  - 常见的有：EasyMock、Mockito 、WireMock、JMockit。主要适用于单元测试。
+- `mock 服务`：即 mock 一个 sever，构造一个依赖的服务并给予他预期的服务返回值，适用范围广，更加适合集成测试。
+  - 如 moco 框架
+
+### 2. mock 服务搭建
+
+#### 1. 下载 moco 框架
+
+在 github 上获取 moco 的 jar 包，当前版本是：V1.2.0
+
+Github 地址 ：https://github.com/dreamhead/moco
+
+![](https://img.pupper.cn/img/20220725182036.png)
+
+### 2. 配置 json 文件
+
+创建一个`json`文件，用来模拟不同的请求，返回不同的响应。
+
+```json
+[
+  {
+    "description": "demo",
+    "request": {
+      "uri": "/demo1"
+    },
+    "response": {
+      "text": "Hello,demo1"
+    }
+  }
+]
+```
+
+- `description`: 是注释（描述），由于 json 无法写注释，所以提供了用这个 key
+- `uri` : 就是我们这个接口的统一资源标识符，可以根据模拟的接口自行定义
+- `response` : 里的内容即为返回的值
+
+### 3. 服务启动
+
+moco 项目是采用 java 开发的，所以启动 moco 前，需要安装 jdk
+
+JDK 安装文档：http://vip.ytesting.com/q.do?a&id=10005
+
+#### 1. 使用 启动文件 启动服务
+
+> 启动文件、json 文件、 moco 框架文件 必须在同一路径下
+
+创建记事本，输入以下代码：
+
+```bash
+@echo off
+echo 接口自动化实战-Mock服务准备启动......
+@echo on
+
+java -jar moco-runner-1.2.0-standalone.jar http -p 9999 -c order_shop.json
+
+@echo off
+echo Mock服务启动成功
+echo 端口号-9999
+echo 执行文件-order_shop.json
+pause
+```
+
+将文件 重命名 为 `Mock_server_run.bat`
+
+![](https://img.pupper.cn/img/20220725182057.png)
+
+#### 2. 使用 命令 启动
+
+打开 cmd 窗口，切换地址到 cmco 路径下，输入启动服务命令
+
+```shell
+java -jar moco-runner-1.2.0-standalone.jar http -p 9999 -c order_shop.json
+```
+
+- `jar 包` ： 名称根据自己下载的 jar 包 版本修改
+- `http` ： 表示模拟的是 http 请求
+- `-p 9999` ： 表示 定义的端口
+- `-c order_shop.json` ： 表示 使用模拟返回的 json 文件
+
+服务开启后，可以通过浏览器访问 http://127.0.0.1:9999/demo1 来访问
+
+`demo1` 为 json 文件中的 uri
+
+### 4. 配置不同的 请求
+
+demo1： 约定 uri
+
+```json
+[
+  {
+    "description": "demo1=约定URI",
+    "request": {
+      "uri": "/demo1"
+    },
+    "response": {
+      "text": "Hello,demo1"
+    }
+  }
+]
+```
+
+demo2： 约定请求参数
+
+```json
+[
+  {
+    "description": "demo2=约定请求参数",
+    "request": {
+      "queries": {
+        "key1": "abc",
+        "key2": "123"
+      }
+    },
+    "response": {
+      "text": "Hello,demo2"
+    }
+  }
+]
+```
+
+demo3： 约定请求方法
+
+```json
+[
+  {
+    "description": "demo3=约定请求方法",
+    "request": {
+      "method": "DELETE"
+    },
+    "response": {
+      "text": "Hello,demo3"
+    }
+  }
+]
+```
+
+demo4： 约定请求头
+
+```json
+[
+  {
+    "description": "demo4=约定请求头",
+    "request": {
+      "headers": {
+        "Content-Type": "application/xml"
+      }
+    },
+    "response": {
+      "text": "Hello,demo4"
+    }
+  }
+]
+```
+
+demo5： 约定请求体参数 - form
+
+```json
+[
+  {
+    "description": "demo5=约定请求体参数-form",
+    "request": {
+      "forms": {
+        "key1": "abc"
+      }
+    },
+    "response": {
+      "text": "Hello,demo5"
+    }
+  }
+]
+```
+
+demo6： 约定请求体参数 - json
+
+```json
+[
+  {
+    "description": "demo6=约定请求体参数-json",
+    "request": {
+      "json": {
+        "key1": "value1",
+        "key2": "value2"
+      }
+    },
+    "response": {
+      "text": "Hello,demo6"
+    }
+  }
+]
+```
+
+Demo7：uri-startsWith 匹配
+
+```json
+[
+  {
+    "description": "demo7=uri-startsWith匹配",
+    "request": {
+      "uri": {
+        "startsWith": "/sq"
+      }
+    },
+    "response": {
+      "text": "Hello,demo7"
+    }
+  }
+]
+```
+
+Demo8：uri-endWith 匹配
+
+```json
+[
+  {
+    "description": "demo8=uri-endsWith匹配",
+    "request": {
+      "uri": {
+        "endsWith": "sq"
+      }
+    },
+    "response": {
+      "text": "Hello,demo8"
+    }
+  }
+]
+```
+
+Demo9：uri-contain 包含
+
+```json
+[
+  {
+    "description": "demo9=uri-contain匹配",
+    "request": {
+      "uri": {
+        "contain": "fcl"
+      }
+    },
+    "response": {
+      "text": "Hello,demo9"
+    }
+  }
+]
+```
+
+Demo10：返回状态码
+
+```json
+[
+  {
+    "description": "demo10=响应状态码",
+    "request": {
+      "uri": "demo10"
+    },
+    "response": {
+      "status": 200
+    }
+  }
+]
+```
+
+Demo11：返回响应头
+
+```json
+[
+  {
+    "description": "demo11=响应头",
+    "request": {
+      "uri": "demo11"
+    },
+    "response": {
+      "headers": {
+        "ContentType": "application/json"
+      }
+    }
+  }
+]
+```
+
+Demo12：重定向
+
+```json
+[
+  {
+    "description": "demo12=重定向",
+    "request": {
+      "uri": "demo12"
+    },
+    "redirectTo": "http://www.baidu.com"
+  }
+]
+```
+
+Demo13：返回 JSON 格式的数据
+
+```json
+[
+  {
+    "description": "demo13=返回json格式的数据",
+    "request": {
+      "uri": "/demo13"
+    },
+    "response": {
+      "json": { "key1": "value1", "key2": "value2" }
+    }
+  }
+]
+```
+
+## 二、 异步 接口
+
+> 同步，是所有的操作都做完，才返回给用户结果。即写完数据库之后，在相应用户，用户体验不好 。
+>
+> 异步，不用等所有操作等做完，就相应用户请求。即先相应用户请求，然后慢慢去写数据库，用户体验较好
+
+**一般流程：**
+
+当你请求一个异步接口,接口会立刻返回你一个结果告诉你已经开始处理,结果中一般会包含一个任务 id 类似的东西用于追踪结果, 另外会提供一个查询结果的接口, 当结果未处理完查询接口会返回相应的"未完成"状态, 如果已经处理完,则会返回相应的数据。
+
+**处理方法：**
+
+- 异步接口我们一般采取轮询的方法,每隔一定时间间隔取请求一下查询结果的接口,直到接口返回的状态是已完成/查询到指定数据或超时
+- 如果异步接口没有提供追踪 id 和查询接口,我们可以通过同样的方法轮询查取数据库数据或日志数据直到获取到指定结果或超时
+
+### 接口示例
+
+#### 1. 订单退出申请接口
+
+请求地址 ： /api/order/create/
+
+请求方法 ： POST
+
+请求格式 ： Json
+
+| 参数     | 类型   | 说明    |
+| -------- | ------ | ------- |
+| user_id  | String | 用户 id |
+| goods_id | String | 商品 id |
+| num      | int    | 数量    |
+| amount   | float  | 总价    |
+
+响应示例
+
+缺少参数:
+
+```python
+{
+    "msg": "参数缺失"
+}
+```
+
+成功:
+
+```python
+{
+    "order_id": "6666"
+}
+```
+
+#### 2、获取订单结果接口
+
+请求地址 ： /api/order/get_result/
+
+请求方法 ： GET
+
+| 参数     | 类型   | 说明    |
+| -------- | ------ | ------- |
+| order_id | String | 订单 id |
+
+响应示例
+
+创建中:
+
+```python
+{}
+```
+
+创建成功:
+
+```python
+{
+    "user_id": "sq123456",
+    "goods_id": "20200815",
+    "num": 1,
+    "amount": 200.6
+    "msg": "success"
+}
+```
+
+### 2. 配置 json 文件
+
+```json
+[
+  {
+    "description": "提交申请接口",
+    "request": {
+      "method": "POST",
+      "uri": "/api/order/create/",
+      "json": {
+        "user_id": "sq001",
+        "goods_id": "20201012",
+        "num": 2,
+        "amount": 100.8
+      }
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "status": 200,
+      "json": {
+        "order_id": "6666"
+      }
+    }
+  },
+  {
+    "description": "查询申请结果接口",
+    "request": {
+      "method": "GET",
+      "uri": "/api/order/get_result/",
+      "queries": {
+        "order_id": "6666"
+      }
+    },
+    "response": {
+      "headers": {
+        "Content-Type": "application/json"
+      },
+      "status": 200,
+      "json": {
+        "user_id": "sq001",
+        "goods_id": "20201012",
+        "num": 2,
+        "amount": 100.8,
+        "msg": "成功"
+      }
+    }
+  }
+]
+```
+
+### 3. python 文件
+
+```python
+import requests
+
+HOST = 'http://127.0.0.1:9999'
+
+# 编写提交申请接口函数
+def create_order():
+    url = f'{HOST}/api/order/create/'
+    payload = {
+        "user_id": "sq001",
+        "goods_id": "20201012",
+        "num": 2,
+        "amount": 100.8
+    }
+    resp = requests.post(url, json=payload)
+    return resp.json()['order_id']  # 返回是字典数据
+```
+
+```python
+# 编写查询结果函数---有点难度----什么时候处理好，你得自己查询，要考虑一个超时的机制
+# 机制：查询的频率（隔多久查询一次）：多少时间超时
+import time
+
+def get_order_result(orderId, interval=5, time_out=30):  # time_out= 30s
+    '''
+    :param orderId: id
+    :param interval: 查询频率 5s查询频率
+    :param time_out: 查询的超时时间
+    :return:
+    '''
+    payload = {'order_id': orderId}  # 封装数据
+    url = f'{HOST}/api/order/get_result01/'
+
+    # 1- 开始查询时间--记录下
+    start_time = time.time()
+    # 2- 结束的时间--要不设定下---超时多少不在查询-----开始时间+你设定的超时时间
+    end_time = start_time + time_out
+    # 3- 在一定时间内进行循环查询
+    cnt = 0  # 计数变量
+    while time.time() < end_time:
+        resp = requests.get(url, params=payload)  #
+        cnt += 1  # 计数变量
+        print(f'第{cnt}次查询', '结果是:--->', resp.text)
+        # 5- 如果接口响应比较快--很短时间就响应数据了
+        if resp.text:
+            break
+        # 4- 设置查询的频率
+        time.sleep(interval)
+    return resp.text
+```

@@ -1,0 +1,18 @@
+{
+  "markdown frontmatter": {
+    "scope": "markdown",
+    "prefix": "fm",
+    "body": ["---", "${1:description}: $2", "---", ""],
+    "description": "markdown frontmatter"
+  },
+  "自定义容器": {
+    "prefix": ":::",
+    "body": ["::: ${1|info,tip,warning,danger,details|} $2", "$3", ":::$4"],
+    "description": "自定义容器"
+  },
+  "代码组": {
+    "prefix": ":::",
+    "body": [":::  code-group", "``` $1 [$2]", "$3", "```", ":::$4"],
+    "description": "自定义容器"
+  }
+}

@@ -1,0 +1,594 @@
+---
+title: 10、接口测试 - Docker 技术
+categories:
+  - 学习笔记
+  - 软件测试
+tags:
+  - 接口测试
+abbrlink: 82c11222
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-277.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#014658'
+---
+
+## 一、 Docker 技术简介
+
+![](https://img.pupper.cn/img/20220725181025.png)
+
+### 1. docker 组成
+
+- `镜像`：相当于 python 里面类的概念，是静态的，不能直接使用
+- `容器`：是通过镜像创建的，相当于实例的概念，是动态的，可以访问的
+- `仓库`：存放镜像的地方
+- `docker宿主机`：你的 docker 安装在哪一个机器，那个机器就是宿主机
+
+### 2. docker 应用场景
+
+- web 应用的自动化打包和发布
+- 自动化测试和持续集成、发布
+- 在服务型环境中部署和调整数据库或其他的后台应用
+- 使用 docker 可以实现开发人员的开发环境、测试人员的测试环境、运维人员的生产环境的一致性
+
+## 二、 CentOS 下安装 Docker
+
+### 1. 版本检查
+
+- CentOS 7 以上版本
+- 操作系统 centos-extras 库必须启用。默认情况下，此库是启用的，但是如果已禁用，则必须重新启动它
+- **Docker 要求 CentOS 内核版本高于 3.10**
+
+```shell
+# 查看系统版本
+
+uname -r
+```
+
+![](https://img.pupper.cn/img/20220725181050.png)
+
+### 2. 安装 Docker
+
+#### 1. 安装需要的软件包
+
+```python
+yum install -y yum-utils device-mapper-persistent-data lvm2
+```
+
+![](https://img.pupper.cn/img/20220725181111.png)
+
+- `yum-util` 是 yum 仓库管理扩展工具包，即它提供了 `yum-config-manager` 功能
+- 另外两个是 `devicemapper` 驱动依赖的
+
+#### 2. 添加 yum 源
+
+```sh
+# 阿里云镜像仓库
+yum-config-manager --add-repo http://mirrors.aliyun.com/docker-ce/linux/centos/docker-ce.repo
+
+# 官网源镜像仓库
+yum-config-manager --add-repo https://download.docker.com/linux/centos/docker-ce.repo
+```
+
+![](https://img.pupper.cn/img/20220725181152.png)
+
+- 利用 `yum-config-manager` 添加 yum 仓库
+- 查看仓库 `ll /etc/yum.repos.d`
+
+![](https://img.pupper.cn/img/20220725181213.png)
+
+#### 3.更新 yum 缓存
+
+```shell
+yum makecache fast
+```
+
+![](https://img.pupper.cn/img/20220725181240.png)
+
+#### 4.查看仓库中 docker 的版本
+
+选择对应的版本安装，列出并排序存储库中可用的版本。按版本号（从高到低）对结果进行排序
+
+```shell
+yum list docker-ce --showduplicates | sort -r
+```
+
+![](https://img.pupper.cn/img/20220725181308.png)
+
+#### 5. 安装 docker
+
+1.  安装最新版本
+
+```shell
+yum install -y docker-ce
+```
+
+2.  安装指定版本
+
+```shell
+yum install docker-ce-版本号
+
+yum install docer-ce-17.12.1.ce
+```
+
+#### 6. 验证是否安装成功
+
+```shell
+docker version
+或者
+docker -v
+
+有client和service两部分标识docker安装并启动成功
+```
+
+![image-20210722180548342](https://img.pupper.cn/img/20210722180548.png)
+
+#### 7. 启动 docker
+
+```shell
+systemctl start docker
+```
+
+1.  启动 ： `systemctl start docker`
+
+2.  关闭 ： `systemctl stop docker`
+
+3.  重启 ： `systemctl restart docker  `
+
+#### 8. 开机自动启动
+
+```shell
+systemctl enable docker
+```
+
+#### 9. 查看 docker 运行状态
+
+```shell
+systemctl status docker
+```
+
+![](https://img.pupper.cn/img/20220725181348.png)
+
+#### 10. 关闭防火墙
+
+```shell
+systemctl stop firewalld 	# 临时关闭
+
+systemctl stop disable		# 永久关闭
+```
+
+## 三、Docker 镜像 加速（阿里云）
+
+> 默认情况下，docker 下载镜像是从官网下载，下载速度特别特别的慢。
+>
+> 使用阿里云加速器可以提升获取 Docker 官方镜像的速度 。
+
+### 1. 阿里云 镜像 加速
+
+每个账号的 镜像 加速 地址都不同
+
+[阿里云 --- 容器镜像服务 地址](https://cr.console.aliyun.com/cn-beijing/instances/mirrors) https://cr.console.aliyun.com/cn-beijing/instances/mirrors
+
+![](https://img.pupper.cn/img/20220725181413.png)
+
+### 2. 在指定目录创建文件（如已存在请忽略此步）
+
+```shell
+vi /etc/docker/daemon.json
+```
+
+### 3. 修改文件内容
+
+```json
+{
+  "registry-mirrors": ["https://elk58vq5.mirror.aliyuncs.com"]
+}
+```
+
+![](https://img.pupper.cn/img/20220725181434.png)
+
+### 4. 重启 Docker 服务
+
+```shell
+systemctl restart docker
+```
+
+## 四、Docker 中安装镜像及操作
+
+### 1. 获取 镜像
+
+#### 1. 查看 本地 镜像
+
+```shell
+docker images
+```
+
+![](https://img.pupper.cn/img/20220725181458.png)
+
+#### 2. 搜索 镜像
+
+```shell
+docker search tomcat
+```
+
+![](https://img.pupper.cn/img/20220725181532.png)
+
+#### 3. 拉取 最新 镜像
+
+```shell
+docker pull tomcat
+```
+
+1.  拉取最新镜像 ： `docker pull tomcat`
+2.  拉取指定镜像 ： `docker pull tomcat:7`
+3.  删除镜像 ： `docker rmi 镜像id`
+
+![](https://img.pupper.cn/img/20220725181600.png)
+
+#### 4. 查看 拉取的 镜像
+
+```shell
+docker images
+```
+
+![](https://img.pupper.cn/img/20220725181625.png)
+
+### 2. 创建 容器
+
+#### 1. 创建容器
+
+根据 tomcat 镜像，创建一个 myTomcat 容器
+
+```shell
+docker create --name=myTomcat tomcat
+```
+
+![](https://img.pupper.cn/img/20220725181650.png)
+
+#### 2. 查看 容器
+
+- 查看运行的容器：
+
+```shell
+docker ps
+```
+
+- 查看所有的容器：
+
+```shell
+docker ps -a
+```
+
+![](https://img.pupper.cn/img/20220725181712.png)
+
+#### 3. 运行 容器
+
+```shell
+docker start myTomcat
+```
+
+start 后面可以跟 容器的`id`（前 2-3 位） 或者 `name`
+
+![](https://img.pupper.cn/img/20220725181737.png)
+
+- 停止 容器：
+
+  ```shell
+  docker stop myTomcat
+  ```
+
+- 删除 没有运行的 容器
+
+  ```shell
+  docker rm 容器id或者名字
+  ```
+
+- 删除 运行的容器
+
+  ```shell
+  docker rm -f 容器ID或者名字
+  ```
+
+- 删除所有容器
+
+  ```shell
+  # 先停止所有的容器
+  docker stop $(docker ps -a -q)
+
+  # 删除
+  docker rm $(docker ps -a -q)
+  ```
+
+### 3. 创建 容器的一些 操作
+
+#### 1. 搭建 web 项目
+
+1.  访问端口 你需要访问的是容器内部的端口
+2.  `war项目文件`这么传递给容器里的`tomcat`里`webapps`下
+
+#### 2. 创建 并 启动容器
+
+`docker run 后面的参数` ：
+
+- `-i` ：运行容器
+- `-t` ： 容器启动后，进入命令行
+- `-v` ： 目录映射 --- 挂载
+  - `-v 宿主机目录:容器目录`
+- `-d` ： 守护进程 --- 后台运行
+- `-p` ： 端口映射
+  - `-p 宿主机端口:容器端口`
+
+**创建容器，并且进入命令行---进入容器**
+
+```shell
+docker run -it --name=myTomcat tomcat/bin/bash
+```
+
+#### 3. 创建 运行 一个守护的 容器
+
+```shell
+docker run -id --name=myTomcat2 tomcat
+```
+
+#### 4. 进入容器
+
+```shell
+docker exec -it myTomcat2 /bin/bash
+```
+
+#### 5. 退出容器
+
+```shell
+exit
+```
+
+### 4. 宿主机（服务器） 与 docker 容器的 文件传递
+
+> 传递文件时，都需要在 宿主机 中输入命令
+
+#### 1. 宿主机 向 docker 容器 传递文件
+
+```shell
+# docker 拷贝 文件名 容器名称:拷贝路径
+
+docker cp xt.txt myTomcat:/
+```
+
+#### 2. docker 容器 向 宿主机 传递文件
+
+```shell
+# docker 拷贝 容器名称:文件名 拷贝路径
+
+docker cp myTomcat:/文件名 /root
+```
+
+### 5. 访问 tomcat
+
+#### 1. 启动并作为守护进程
+
+> - `-p` ： 宿主机的端口:容器里应用的端口 --- 8080
+> - `-v` ： war 挂载到宿主机 宿主机路径:容器路径（路径会新建）
+
+**创建并运行一个名为 myTomcat 的守护容器，端口为 8080，war 挂载到了宿主机的 /usr/local/tomcat/webapps 目录**
+
+```shell
+docker run -id --name=myTomcat -p 8080:8080 -v /usr/local/tomcat/webapps:/usr/local/tomcat/webapps tomcat
+```
+
+把 war 包放到宿主机的 挂载目录里，直接刷新浏览器就可以出现项目的页面
+
+#### 2. 启动容器时关联其他容器
+
+```shell
+docker run -id --name=tomcat2 -p 8080:8080 --link mysql --link redis --link rabbitmq
+```
+
+## 五、 查看日志 （ docker logs 命令）
+
+`docker logs [options] 容器名称或ID` 获取容器日志
+
+| 名字              | 默 认 值                                         | 描述                     |
+| ----------------- | ------------------------------------------------ | ------------------------ |
+| –details          | 显示提供给日志的额外细节                         |                          |
+| –follow 或-f      | 按日志输出                                       |                          |
+| –since            | 从某个时间开始显示，例如 2013- 01-02T13:23:37    |                          |
+| –tail             | all                                              | 从日志末尾多少行开始显示 |
+| – timestamps 或-t | 显示时间戳                                       |                          |
+| –until            | 打印某个时间以前的日志，例如 2013-01-02T13:23:37 |                          |
+
+```shell
+# 通过docker logs命令可以查看容器的日志。
+
+docker logs -f --tail 10 a4dac74d48f7
+```
+
+```shell
+# 查看指定时间后的日志，只显示最后100行：
+
+docker logs -f -t --since="2018-02-08" --tail=100 CONTAINER_ID
+```
+
+```shell
+# 查看某时间段日志
+
+docker logs -t --since="2018-02-08T13:23:37" --until "2018-02-09T12:23:37" CONTAINER_ID
+```
+
+## 六、容器 图形化管理工具（ Portainer ）
+
+1.查看 portainer 镜像
+
+```shell
+docker search portainer
+```
+
+2.选择喜欢的 portainer 风格镜像，下载
+
+```shell
+docker pull portainer/portainer
+```
+
+3.启动 dockerui 容器
+
+```shell
+docker run -id --name=portainer -p 9000:9000 -v /var/run/docker.sock:/var/run/docker.sock portainer/portainer
+```
+
+4、浏览器访问 http://你虚拟机的 ip:9000, 设置一个密码即可，点击创建用户 密码要 8 位以上
+
+5、我们搭建的是单机版，进入页面直接选择 Local ，点击连接
+
+## 七、docker 旧版卸载
+
+### 1. 卸载它们以及相关的依赖项
+
+```shell
+sudo yum remove docker \docker-client \docker-client-latest \docker-common \docker-latest \docker-latest-logrotate \docker-logrotate \docker-engine
+```
+
+### 2. 安装 Docker Engine-Community
+
+在新主机上首次安装 Docker Engine-Community 之前，需要设置 Docker 仓库。
+
+之后，您可以从仓库安装和更新 Docker。
+
+#### 1. 设置仓库
+
+安装所需的软件包。
+
+```shell
+sudo yum install -y yum-utils \device-mapper-persistent-data \lvm2
+```
+
+使用以下命令来设置稳定的仓库。阿里云
+
+```shell
+sudo yum-config-manager \--add-repo \ http://mirrors.aliyun.com/dockerce/linux/centos/docker-ce.repo
+```
+
+#### 2. 安装 Docker Engine-Community
+
+```shell
+sudo yum install docker-ce docker-ce-clicontainerd.io
+```
+
+一直输入 y 回车即可
+
+### 3. 启动 docker
+
+```shell
+sudo systemctl start docker
+```
+
+## 八、 修改 容器的 映射端口及挂载目录
+
+### 1. 停止容器
+
+```shell
+docker stop 容器id或名称
+```
+
+### 2. 停止 docker 服务
+
+```shell
+systemctl stop docker
+```
+
+### 3. 修改 hostconfig.json 文件
+
+> `config,v2.json` 中如果也记录了端口，需要一并修改
+
+文件目录：
+
+```shell
+cd /var/lib/docker/containers/容器id
+
+vi hostconfig.json
+```
+
+![](https://img.pupper.cn/img/20220725181827.png)
+
+#### 1. 修改 映射端口
+
+没有端口映射时：`“PortBindings”:{}  `
+
+增加一个端口映射：
+
+> 前面的 “3306” 为 容器端口， 后面的 “3307” 为宿主机端口
+>
+> 如果修改现有端口映射，则可以直接修改
+
+```json
+“PortBindings”:{“3306/tcp”:[{“HostIp”:"",“HostPort”:“3307”}]}
+```
+
+#### 2. 修改 挂载目录
+
+> 前面的地址为 宿主机挂载目录，后面的地址为 容器目录地址
+
+```shell
+"Binds":["/var/run/docker.sock:/var/run/docker.sock"
+```
+
+### 4. 启动 docker 服务
+
+```shell
+systemstl start docker
+```
+
+### 5. 启动 容器
+
+```shell
+docker start 容器id
+```
+
+### 6. 查看修改后的结果
+
+```shell
+docker ps -a
+```
+
+### 7. 查看修改后的挂载目录
+
+```
+docker inspect container_id | grep Mounts -A 20
+```
+
+## 九、 同步时间
+
+### 1.查看宿主机时间
+
+```shell
+date
+```
+
+### 2. 安装 ntp
+
+```shell
+yum install ntp
+```
+
+### 3. 同步时间
+
+```shell
+docker cp /etc/localtime 容器id或名称:/etc/localtime
+```
+
+报错：
+
+![](https://img.pupper.cn/img/20220725181909.png)
+
+```shell
+docker cp /usr/share/zoneinfo/Asia/Shanghai 容器ID或名称:/etc/localtime
+```
+
+### 4. 重启 容器
+
+```shell
+docker restart 容器id或名称
+```
+
+> **注意事项：**
+>
+> - 可能网络会断开，请重新 reboot 下 linux
+> - 虚拟机的 ip 可能会改变

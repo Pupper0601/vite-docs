@@ -1,0 +1,273 @@
+---
+title: VUE3 - 组件
+categories:
+  - 学习笔记
+  - 前端基础
+tags:
+  - VUE3
+abbrlink: 8c92e9f9
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-161.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#856e91'
+---
+
+## 一、 组件
+
+### 1. 非单文件组件
+
+Vue 使用组件的三大步骤：
+
+#### 创建组件
+
+使用 Vue.extend(options) 创建组件
+注意：
+
+1. el 不好写
+2. data 必须写成函数
+
+```js
+//第一步：创建student组件
+const student = Vue.extend({
+  template: `
+        <div>
+            <h2>学生姓名：{{studentName}}</h2>
+            <h2>学生年龄：{{age}}</h2>
+        </div>
+    `,
+  data() {
+    return {
+      studentName: '张三',
+      age: 18,
+    }
+  },
+})
+```
+
+#### 注册组件
+
+1. 局部注册：靠 new Vue 的时候传入 components 选项
+2. 全局注册：靠 Vue.component('组件名',组件)
+
+```js
+//第二步：全局注册组件
+Vue.component('hello', hello)
+
+//创建vm
+new Vue({
+  el: '#root',
+  data: {
+    msg: '你好啊！',
+  },
+  //第二步：注册组件（局部注册）
+  components: {
+    student,
+  },
+})
+```
+
+#### 使用组件
+
+```html
+<div id="root">
+  <!-- 第三步：编写组件标签 -->
+  <student></student>
+</div>
+```
+
+关于组件名:
+
+1. 一个单词组成：
+1. 第一种写法(首字母小写)：school
+1. 第二种写法(首字母大写)：School
+1. 多个单词组成：
+1. 第一种写法(kebab-case 命名)：my-school
+1. 第二种写法(CamelCase 命名)：MySchool (需要 Vue 脚手架支持)
+   备注：
+   可以使用 `name` 配置项指定组件在开发者工具中呈现的名字。
+
+关于组件标签:
+
+1. 第一种写法：<school></school>
+2. 第二种写法：<school/>
+   备注：不用使用脚手架时，<school/>会导致后续组件不能渲染。
+
+一个简写方式：
+const school = Vue.extend(options) 可简写为：const school = options
+
+::: details
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>组件的嵌套</title>
+    <!-- 引入Vue -->
+    <script type="text/javascript" src="../js/vue.js"></script>
+  </head>
+  <body>
+    <!-- 准备好一个容器-->
+    <div id="root"></div>
+  </body>
+
+  <script type="text/javascript">
+    Vue.config.productionTip = false //阻止 vue 在启动时生成生产提示。
+
+    //定义student组件
+    const student = Vue.extend({
+      name: 'student',
+      template: `
+				<div>
+					<h2>学生姓名：{{name}}</h2>	
+					<h2>学生年龄：{{age}}</h2>	
+				</div>
+			`,
+      data() {
+        return {
+          name: '尚硅谷',
+          age: 18,
+        }
+      },
+    })
+
+    //定义school组件
+    const school = Vue.extend({
+      name: 'school',
+      template: `
+				<div>
+					<h2>学校名称：{{name}}</h2>	
+					<h2>学校地址：{{address}}</h2>	
+					<student></student>
+				</div>
+			`,
+      data() {
+        return {
+          name: '尚硅谷',
+          address: '北京',
+        }
+      },
+      //注册组件（局部）
+      components: {
+        student,
+      },
+    })
+
+    //定义hello组件
+    const hello = Vue.extend({
+      template: `<h1>{{msg}}</h1>`,
+      data() {
+        return {
+          msg: '欢迎来到尚硅谷学习！',
+        }
+      },
+    })
+
+    //定义app组件
+    const app = Vue.extend({
+      template: `
+				<div>	
+					<hello></hello>
+					<school></school>
+				</div>
+			`,
+      components: {
+        school,
+        hello,
+      },
+    })
+
+    //创建vm
+    new Vue({
+      template: '<app></app>',
+      el: '#root',
+      //注册组件（局部）
+      components: { app },
+    })
+  </script>
+</html>
+```
+
+:::
+
+### 2. 单文件组件
+
+<code-group>
+<code-block title='student.vue' active>
+
+```vue
+<template>
+  <div>
+    <h2>学生姓名：{{ name }}</h2>
+    <h2>学生年龄：{{ age }}</h2>
+  </div>
+</template>
+<script>
+export default {
+  name: 'Student',
+  data() {
+    return {
+      name: '张三',
+      age: 18,
+    }
+  },
+}
+</script>
+```
+
+</code-block>
+<code-block title='app.vue' active>
+
+```vue
+<template>
+  <div>
+    <Student></Student>
+  </div>
+</template>
+
+<script>
+//引入组件
+import Student from './Student.vue'
+
+export default {
+  name: 'App',
+  components: {
+    Student,
+  },
+}
+</script>
+```
+
+</code-block>
+<code-block title='main.js' active>
+
+```js
+import App from './App.vue'
+
+new Vue({
+  el: '#root',
+  template: `<App></App>`,
+  components: { App },
+})
+```
+
+</code-block>
+<code-block title='index.html' active>
+
+```html
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>练习一下单文件组件的语法</title>
+  </head>
+  <body>
+    <!-- 准备一个容器 -->
+    <div id="root"></div>
+  </body>
+</html>
+```
+
+</code-block>
+</code-group>

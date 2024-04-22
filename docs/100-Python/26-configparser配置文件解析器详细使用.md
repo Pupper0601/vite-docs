@@ -1,0 +1,211 @@
+---
+title: Configparser 配置文件解析器详细使用
+categories:
+  - 学习笔记
+tags:
+  - Python基础
+toc_style_simple: true
+date: '2024-02-04 09:47:50'
+update: '2024-02-04 09:48:15'
+cover: 'https://top-img.pupper.cn/top-img/top-img-44.webp'
+main_color: '#5c0100'
+abbrlink: 6b4cb1cf
+---
+
+# 1.configparser 简介
+
+- configparser 是 python 提供用来处理配置文件的类;
+- 该模块定义了 ConfigParser 类, ConfigParser 类实现一种基本的配置文件解析语言
+- 该语言提供的结构类似于 .ini 文件中的结构
+-
+
+# 2.ini 文件相关知识
+
+- [section] 区分大小写, 前后空格不会被处理, 同一个配置文件中不允许重复;
+- key 不区分大小写, 前后空格会被处理, 同一个 [section] 中不允许重复;
+- key 和 value 可以使用 key = value 也可以使用 key:value
+- 配置文件可以包含注释, 注释以 # 或者 ; 为前缀
+- 基本格式是由多个 section 组成，其中包含一个[DEFAULT]的 section，用来进行默认配置
+
+```ini
+[DEFAULT]
+serveraliveinterval = 45
+compression = yes
+compressionlevel = 9
+
+[bitbucket]
+user = kk
+
+[topsecrect]
+port = 22
+```
+
+# 3.关于 [DEFAULT]
+
+- [DEFAULT]一般包含 ini 格式配置文件的默认项,
+  - 所以 configparser 部分方法会自动跳过这个 section
+- [DEFAULT] 是特殊的节点, 使用 config.sections()时不会被输出, 当调用其他节点的 key 时
+  - 若其他节点中存在 key, 输出对应节点的 key 及 value
+  - 若其他节点中不存在 key, DEFAULT 中存在对应的 key, 则输出 DEFAULT 中的 key
+
+# 4.创建配置文件
+
+```python
+import configparser
+
+config = configparser.ConfigParser()
+config["DEFAULT"] = {
+    "serveraliveinterval": "45",
+    "compression": "yes",
+    "compressionlevel": "9"
+}
+
+# 写法一
+config["user"] = {}
+config["user"]["name"] = "张三"
+config["user"]["sex"] = "1"
+config["user"]["age"] = "18"
+config["user"]["height"] = "1.75"
+
+# 写法二
+config["mysql"] = {}
+mysql = config["mysql"]
+mysql["host"] = "127.0.0.1"
+mysql["port"] = '3306'
+mysql['user'] = 'root'
+mysql['password'] = '123456'
+
+with open('../config1.ini', 'w+') as f:
+    config.write(f)
+```
+
+# 5.读取配置文件
+
+- 配置文件中有中文时, 调用 read() 方法时, 需要传 encoding="utf-8-sig" 参数
+- get(section, option, fallback="默认值"), 获取某个 option 值,
+- 当然也可以传 fallback, 当 option 不存在时, 就会返回 fallback 的值
+
+## 5.1 读取节名
+
+```python
+import configparser
+
+config = configparser.ConfigParser()
+
+# 得到配置文件里面的数据
+config.read('../config1.ini', encoding='utf-8')
+
+# 查看config配置文件中的配置项(配置模块的名字)
+print(config.sections())    # ['user', 'topsecrect']
+```
+
+## 5.2 判断节名是否存在
+
+```python
+print('user' in config)     # True
+print('name' in config)     # False
+```
+
+## 5.3 循环读取配置
+
+```python
+for key, value in config['user'].items():
+    print(key, value)
+
+# name 张三
+# sex 男
+# age 18
+# height 1.75
+# serveraliveinterval 45
+# compression yes
+# compressionlevel 9
+```
+
+## 5.4 读取具体配置
+
+```python
+mysql_host = config['mysql']['host']
+print(mysql_host)       # 127.0.0.1
+```
+
+## 5.5 读取节的 key
+
+```Python
+print(config.options('mysql'))
+
+# ['host', 'port', 'user', 'password', 'serveraliveinterval', 'compression', 'compressionlevel']
+```
+
+## 5.6 读取键值对
+
+```Python
+print(config.items('user'))
+
+# [('serveraliveinterval', '45'), ('compression', 'yes'), ('compressionlevel', '9'), ('name', '张三'), ('sex', '男'), ('age', '18'), ('height', '1.75')]
+```
+
+## 5.7 返回特定数据类型
+
+```python
+# 获取 user 下的值
+name = config.get('user', 'name')
+print(name, type(name))     # 张三 <class 'str'>
+
+sex = config['user'].getboolean('sex')
+print(sex, type(sex))     # True <class 'bool'>
+
+age_int = config['user'].getint('age')
+print(age_int, type(age_int))   # 18 <class 'int'>
+
+height_float = config['user'].getfloat('height')
+print(height_float, type(height_float))     # 1.75 <class 'float'>
+```
+
+# 6.增加配置
+
+```Python
+import configparser
+
+config = configparser.ConfigParser()
+config.read('../config1.ini', encoding='utf-8')
+
+# 7. 增加新的节
+config.add_section('yuan')
+config.set('yuan', 'k2', '2222')
+
+# 在已有的节中添加
+config.set('user', 'address', '杭州')
+
+config.write(open('../config1.ini', 'w+', encoding='utf-8'))
+```
+
+# 7.修改配置
+
+```python
+import configparser
+
+config = configparser.ConfigParser()
+config.read('../config1.ini', encoding='utf-8')
+
+config.set('user', 'name', '李四')
+config.set('user', 'sex', '0')
+
+config.write(open('../config1.ini', 'w+', encoding='utf-8'))
+```
+
+# 8.删除配置
+
+```Python
+import configparser
+
+config = configparser.ConfigParser()
+config.read('../config1.ini', encoding='utf-8')
+
+# 删除配置项
+config.remove_option('mysql', 'host')
+
+# 删除整个节, 包含其中配置项
+config.remove_section('yuan')
+
+config.write(open('../config1.ini', 'w+', encoding='utf-8'))
+```

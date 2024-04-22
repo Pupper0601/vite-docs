@@ -1,0 +1,634 @@
+---
+title: 4、接口测试 - Pytest 自动化框架
+categories:
+  - 学习笔记
+  - 软件测试
+tags:
+  - 接口测试
+abbrlink: ca5a0445
+toc_style_simple: true
+cover: https://img.pupper.cn/top-img/top-img-327.webp
+date: '2023-02-20 08:00:01'
+update: '2023-02-20 17:53:18'
+main_color: '#52371d'
+---
+
+# 一. 安装
+
+## 1.1 Pytest 环境搭建
+
+安装：
+
+```shell
+pip install pytest
+```
+
+查看是否安装成功：
+
+```shell
+pip show pytest
+```
+
+## 1.2 命名规则
+
+- `.py` 测试文件必须以 `test_` 开头（或者以 `_test` 结尾）
+- 测试类必须以 `Test` 开头，并且 **不能** 有 `init 方法`
+- 测试方法必须以 `test_` 开头
+- 断言必须使用 `assert`
+
+## 1.3 pytest 输出的信息
+
+- `.` ：用例通过
+- `F` ：用例失败--没有语法报错
+- `E` ：语法错误
+
+## 1.4 运行参数
+
+- `-s`: 打印代码中 `print` 内容
+- `-v`: 打印更详细的执行信息, 包括 测试类、测试函数等
+
+## 1.5 案例
+
+```python
+# 1- 封装测试类
+class TestLogin:
+    # [({},{}),({},{})]
+    @pytest.mark.parametrize('inData,respData', get_excelData2('登录模块', 'Login'))  # parametrize('变量'，值)
+    def test_login(self, inData, respData):
+        # 1- 调用--封装模块
+        res = Login().login(inData, getToken=False)
+        print(res)
+        # 2- 断言  实际结果与预期的结果进行比较
+        assert res['msg'] == respData['msg']
+```
+
+# 二. 初始化
+
+## 2.1 模块级别
+
+::: tip
+在整个模块的测试用例 执行前后执行,`只会执行 1 次`
+:::
+
+模块级别 - 初始化案例
+
+```python
+# 如下定义 setup_module 和 teardown_module 全局函数
+def setup_module():
+    print('\n *** 初始化-模块 ***')
+
+def teardown_module():
+    print('\n ***   清除-模块 ***')
+
+class TestDemo1:
+
+    def test_C001001(self):
+        print('\n用例C001001')
+        assert 1 == 1
+
+    def test_C001002(self):
+        print('\n用例C001002')
+        assert 2 == 2
+
+    def test_C001003(self):
+        print('\n用例C001003')
+        assert 3 == 2
+
+class TestDemo2:
+
+    def test_C001021(self):
+        print('\n用例C001021')
+        assert 1 == 1
+
+    def test_C001022(self):
+        print('\n用例C001022')
+        assert 2 == 2
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+ *** 初始化-模块 ***
+用例C001001
+.
+用例C001002
+.
+用例C001003
+F
+用例C001021
+.
+用例C001022
+.
+ ***   清除-模块 ***
+"""
+```
+
+## 2.2 类级别
+
+::: tip
+在类执行的前后执行, `只会执行 1 次`
+:::
+
+类级别 - 初始化案例
+
+```python
+# 如下定义 setup_class 和 teardown_class 类方法
+import pytest
+
+def setup_module():
+    print('\n *** 初始化-模块 ***')
+
+def teardown_module():
+    print('\n ***   清除-模块 ***')
+
+class TestDemo1:
+
+    @classmethod
+    def setup_class(cls):
+        print('\n === 初始化-类 ===')
+
+    @classmethod
+    def teardown_class(cls):
+        print('\n === 清除 - 类 ===')
+
+    def test_C001001(self):
+        print('\n用例C001001')
+        assert 1 == 1
+
+    def test_C001002(self):
+        print('\n用例C001002')
+        assert 2 == 2
+
+    def test_C001003(self):
+        print('\n用例C001003')
+        assert 3 == 2
+
+class TestDemo2:
+
+    def test_C001021(self):
+        print('\n用例C001021')
+        assert 1 == 1
+
+    def test_C001022(self):
+        print('\n用例C001022')
+        assert 2 == 2
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+*** 初始化-模块 ***
+=== 初始化-类 ===
+用例C001001
+.
+用例C001002
+.
+用例C001003
+F
+=== 清除 - 类 ===
+用例C001021
+.
+用例C001022
+.
+ ***   清除-模块 ***
+"""
+```
+
+## 2.3 方法类别
+
+::: tip
+在 每个方法执行前后执行, `每个用例分别执行 1 次`
+:::
+
+方法级别 - 初始化案例
+
+```python
+import pytest
+
+def setup_module():
+    print('\n *** 初始化-模块 ***')
+
+def teardown_module():
+    print('\n ***   清除-模块 ***')
+
+class TestDemo1:
+    @classmethod
+    def setup_class(cls):
+        print('\n === 初始化-类 ===')
+
+    @classmethod
+    def teardown_class(cls):
+        print('\n === 清除 - 类 ===')
+
+    def setup_method(self):
+        print('\n --- 初始化-方法  ---')
+
+    def teardown_method(self):
+        print('\n --- 清除  -方法 ---')
+
+    def test_C001001(self):
+        print('\n用例C001001')
+        assert 1 == 1
+
+    def test_C001002(self):
+        print('\n用例C001002')
+        assert 2 == 2
+
+    def test_C001003(self):
+        print('\n用例C001003')
+        assert 3 == 2
+
+class TestDemo2:
+    def test_C001021(self):
+        print('\n用例C001021')
+        assert 1 == 1
+
+    def test_C001022(self):
+        print('\n用例C001022')
+        assert 2 == 2
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+*** 初始化-模块 ***
+ === 初始化-类 ===
+ --- 初始化-方法  ---
+用例C001001
+.
+ --- 清除  -方法 ---
+ --- 初始化-方法  ---
+用例C001002
+.
+ --- 清除  -方法 ---
+ --- 初始化-方法  ---
+用例C001003
+F
+ --- 清除  -方法 ---
+ === 清除 - 类 ===
+用例C001021
+.
+用例C001022
+.
+ ***   清除-模块 ***
+"""
+```
+
+# 三. 挑选用例执行
+
+## 3.1 运行执行模块
+
+```sh
+pytest xxx/xxx/xxx.py
+```
+
+## 3.2 运行指定目录
+
+```sh
+# 指定单个目录
+pytest cases1
+
+# 指定多个目录
+pytest cases1 cases2
+```
+
+## 3.3 指定模块里的函数或类
+
+```sh
+# 指定一个类
+pytest xxx/xxx.py::TestDemo
+```
+
+```sh
+# 指定类中的方法
+pytest xxx/xxx.py::TestDemo::test_demo1
+```
+
+## 3.4 根据函数名执行
+
+```sh
+pytest -k c001 -s
+```
+
+::: tip
+`-k`后面的名字:
+
+- 可以是函数名、类名、模块名 目录名
+- 大小写敏感
+- 不一定要完整,匹配上就行(如 `test_demo1` 可以写为 `demo1`)
+- 支持关键字连接:
+  - `not`: 表示不包含 `(pytest -k "not demo1" -s)`
+  - `and`: 表示同时包含多个关键字 `(pytest -k "demo1 and demo2")`
+  - `or`: 表示包含关键字之一 `(pytest -k "demo1 or demo2")`
+    :::
+
+## 3.5 根据标签执行
+
+::: info
+
+- 使用 `@pytest.mark.标签名` 给类或方法或整个文件添加标签
+- 标签支持中文
+  :::
+
+```python
+import pytest
+
+# 给整个模块添加标签
+pytestmark = pytest.mark.网页测试
+
+# 给整个模块添加多个标签
+pytestmark = [pytest.mark.网页测试, pytest.mark.登录测试]
+```
+
+```python
+@pytest.mark.登录测试
+class Test_错误密码2:
+    @pytest.mark.webtest
+    def test_C001021(self):
+        print('\n用例C001021')
+        assert 1 == 1
+```
+
+```python
+pytest cases -m webtest -s
+```
+
+# 四. 数据驱动
+
+::: info
+`@pytest.mark.parametrize(变量1,变量2,... [(数据1,数据2...),(数据1,数据2...)...])`
+:::
+
+```python
+class Test_错误登录:
+    @pytest.mark.parametrize('username, password, expectedalert', [
+        (None, '88888888', '请输入用户名'),
+        ('byhy', None, '请输入密码'),
+        ('byh', '88888888', '登录失败 : 用户名或者密码错误'),
+        ('byhy', '8888888', '登录失败 : 用户名或者密码错误'),
+        ('byhy', '888888888', '登录失败 : 用户名或者密码错误'),
+    ]
+                             )
+    def test_UI_0001_0005(self, username, password, expectedalert):
+        alertText = loginAndCheck(username, password)
+        assert alertText == expectedalert
+```
+
+# 五. fixture
+
+## 5.1 初始化
+
+::: danger
+@pytest.fixture : 声明式 初始化
+:::
+
+```python
+import pytest
+
+# 定义一个fixture函数
+@pytest.fixture
+def createzhangSan():
+    # 这里代码实现了使用API创建用户张三账号功能
+    print('\n *** createzhangSan ***')
+    zhangSan = {
+        'username'   : 'zhangsan',
+        'password'   : '111111',
+        'invitecode' : 'abcdefg' # 这是系统创建用户产生的其它信息
+    }
+    return zhangSan
+
+# 这里测试张三账号登录的功能
+def test_A001001(createzhangSan):
+    print('\n用例 A001001')
+    print('\ninvitecode is', createzhangSan['invitecode'])
+
+# 这里测试其它功能，不需要张三账号
+def test_C001001():
+    print('\n用例 C001001')
+
+"""
+test_1.py::test_A001001
+ *** createzhangSan ***
+用例 A001001
+invitecode is abcdefg
+PASSED
+
+test_1.py::test_C001001
+用例 C001001
+PASSED
+"""
+```
+
+## 5.2 清除
+
+::: info
+`yield` 后面的代码就是清除部分的代码
+:::
+
+```python
+import pytest
+
+# 定义一个fixture函数
+@pytest.fixture
+def createzhangSan():
+    print('\n ***  执行创建张三账号的代码 ***')
+    zhangSan = {
+        'username'   : 'zhangsan',
+        'password'   : '111111',
+        'invitecode' : 'abcdefg' # 这是系统创建用户产生的其它信息
+    }
+
+    yield zhangSan
+
+    print('\n ***  执行清除张三账号的代码 ***')
+
+def test_A001001(createzhangSan):
+    print('\n用例 A001001')
+    print('\ninvitecode is', createzhangSan['invitecode'])
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+test_1.py::test_A001001
+ ***  执行创建张三账号的代码 ***
+
+用例 A001001
+
+invitecode is abcdefg
+PASSED
+ ***  执行清除张三账号的代码 ***
+"""
+```
+
+## 5.3 fixture 参数
+
+::: info
+如果需要不同的参数来初始化, 则需要使用 `parametrize` 装饰器, 并指定参数 `indirect = True`
+:::
+
+fixture 参数化 案例
+
+```python
+import pytest
+
+# 定义一个fixture函数
+@pytest.fixture
+def createUser(request):
+    # 这里代码实现了使用API创建用户账号功能
+    print("\n **** 初始化 ****")
+    print('\n *** createUser ***')
+    user = {
+        'username': request.param[0],
+        'password': request.param[1],
+        'invitecode': 'abcdefg'  # 这是系统创建用户产生的其它信息
+    }
+
+    yield user
+    print("****** 清除 ********")
+
+@pytest.mark.parametrize("createUser", [("zhangsan", "111111"), ("lisi", "111")], indirect=True)
+def test_A001001(createUser):
+    print('\n用例 A001001')
+    print('\nusername is', createUser['username'])
+    print('测试行为1111')
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+test_demo/test_demo1.py::test_A001001[createUser0]
+ **** 初始化 ****
+ *** createUser ***
+PASSED                [ 50%]
+用例 A001001
+
+username is zhangsan
+测试行为1111
+****** 清除 ********
+
+test_demo/test_demo1.py::test_A001001[createUser1]
+ **** 初始化 ****
+ *** createUser ***
+PASSED                [100%]
+用例 A001001
+
+username is lisi
+测试行为1111
+****** 清除 ********
+"""
+```
+
+## 5.4 使用范围
+
+fixture 由小到大，有下面这几种级别范围
+
+- `function` : 函数级别，缺省值
+  - 会在测试函数结束时执行 fixture 对应的清除
+- `class` : 类级别
+  - 会在 类 里面的最后一个测试方法 结束时 执行 fixture 对应的清除
+- `module` : 模块文件级别
+  - 会在 模块文件 里面的最后一个测试方法 结束时 执行 fixture 对应的清除
+- `package` : 目录级别
+  - 会在 目录 里面的最后一个测试方法 结束时 执行 fixture 对应的清除
+- `session` : 整个测试 级别
+  - 会在 整个测试 的最后一个测试方法 结束时 执行 fixture 对应的清除
+
+## 5.5 自动使用 fixture
+
+::: info
+需要默认使用时, 设置参数 `autouse=True`, 如果不设置, 则需要在使用的函数中传入 fixture 函数名
+:::
+
+fixture 使用案例
+
+```python
+import pytest
+
+pytestmark = pytest.mark.模块标签
+
+@pytest.fixture(scope='function', autouse=True)
+def init_function():
+    print("\n 函数级 - 用例初始化")
+    yield
+    print("\n 函数级 - 数据清除")
+
+@pytest.fixture(scope='class', autouse=True)
+def init_class():
+    print("\n 类级 - 用例初始化")
+    yield
+    print("\n 类级 - 数据清除")
+
+@pytest.fixture(scope='module')
+def init_module():
+    print("\n 模块级 - 用例初始化")
+    yield
+    print("\n 模块级 - 数据清除")
+
+@pytest.fixture(scope='package', autouse=True)
+def init_package():
+    print("\n 目录级 - 用例初始化")
+    yield
+    print("\n 目录级 - 数据清除")
+
+@pytest.fixture(scope='session', autouse=True)
+def init_session():
+    print("\n 整个测试级 - 用例初始化")
+    yield
+    print("\n 整个测试级 - 数据清除")
+
+@pytest.mark.类标签
+class TestDemo:
+    @pytest.mark.方法标签
+    def test_demo1(self, init_module):
+        print("\n 测试用例 1 执行")
+
+if __name__ == '__main__':
+    pytest.main(['test_demo1.py', '-s'])
+
+"""
+test_demo/test_demo1.py::TestDemo::test_demo1
+ 整个测试级 - 用例初始化
+ 目录级 - 用例初始化
+ 模块级 - 用例初始化
+ 类级 - 用例初始化
+ 函数级 - 用例初始化
+PASSED                     [100%]
+ 测试用例 1 执行
+ 函数级 - 数据清除
+ 类级 - 数据清除
+ 模块级 - 数据清除
+ 目录级 - 数据清除
+ 整个测试级 - 数据清除
+"""
+```
+
+# 六. allure 报告环境搭建
+
+## 6.1 安装插件
+
+```shell
+pip install Allure-Pytest
+```
+
+## 6.2 安装 allure
+
+- 安装 JAVA 环境
+  - https://www.java.com/zh-CN/download/manual.jsp
+- 下载 allure 压缩包
+  - [allure 官网](https://github.com/allure-framework/allure2/releases/tag/2.13.10)
+- 解压 压缩包，配置环境变量
+  - `path` 中 配置环境变量 （`G:\allure-2.13.3\bin`)
+
+## 6.3 使用
+
+```python
+if __name__ == '__main__':
+    # -s:输出打印信息； -q  简化输出
+    # --alluredir =../report/tmp---生成allure报告需要的源数据
+    pytest.main(['test_login.py', '-s', '--alluredir', '../report/tmp'])
+    # allure generate---生成报告
+    # 方案二：allure serve---起服务----自动打开浏览器---一般设置默认浏览器
+    os.system('allure serve ../report/tmp')
+    # 生成报告
+```
