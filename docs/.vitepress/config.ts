@@ -26,6 +26,9 @@ export default defineConfig({
 
   /* 主题配置 */
   themeConfig: {
+    search: {
+      provider: 'local',
+    },
     i18nRouting: false,
 
     logo: '/logo.png',
@@ -50,7 +53,7 @@ export default defineConfig({
     lastUpdatedText: '上次更新',
 
     /* Algolia DocSearch 配置 */
-    algolia,
+    // algolia,
 
     docFooter: {
       prev: '上一篇',
