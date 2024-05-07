@@ -18,10 +18,10 @@ export default defineConfig({
 
   lastUpdated: true,
   cleanUrls: true,
-
   /* markdown 配置 */
   markdown: {
     lineNumbers: true,
+    theme: 'min-dark',
   },
 
   /* 主题配置 */

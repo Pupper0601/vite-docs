@@ -1,0 +1,47 @@
+div[class*='language-']:after {
+  position: absolute;
+  top: 0.6rem;
+  left: 0.7rem;
+  height: 0.8rem;
+  width: 0.8rem;
+  border-radius: 9999px;
+  content: '';
+  background: #fc625d;
+  box-shadow:
+    20px 0 #fdbc40,
+    40px 0 #35cd4b;
+}
+
+.vp-doc .line-numbers-wrapper,
+.vp-doc .line-numbers-mode .vp-code {
+  margin: 35px 0 10px;
+  padding: 0;
+}
+
+.vp-doc div[class*='language-'].line-numbers-mode {
+  padding-left: 23px;
+  background-color: #292c33;
+}
+
+.vp-doc .line-numbers-wrapper {
+  color: rgb(158 158 158);
+  border-right: 1px solid #0e0f11;
+  width: 40px;
+}
+
+.vp-doc [class*='language-'] > span.lang {
+  position: absolute;
+  z-index: 3;
+  top: 0.3em;
+  left: 4.7rem;
+  font-size: 1.15em;
+  color: rgba(238, 255, 255, 0.8);
+  text-transform: uppercase;
+  font-weight: bold;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+
+.vp-doc [class*='language-']:hover > button.copy + span.lang {
+  opacity: 1;
+}

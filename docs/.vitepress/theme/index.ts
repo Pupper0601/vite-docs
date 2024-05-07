@@ -8,6 +8,7 @@ import MNavVisitor from './components/MNavVisitor.vue'
 import MDocFooter from './components/MDocFooter.vue'
 import MAsideSponsors from './components/MAsideSponsors.vue'
 import MNavLinks from './components/MNavLinks.vue'
+import CodeBlock from './components/CodeBlock.vue'
 
 import './styles/index.scss'
 
@@ -27,7 +28,7 @@ if (typeof window !== 'undefined') {
       return Promise.all(
         keyList.map(function (key) {
           return caches.delete(key)
-        })
+        }),
       )
     })
   }
@@ -36,6 +37,7 @@ if (typeof window !== 'undefined') {
 let homePageStyle: HTMLStyleElement | undefined
 
 export default {
+  CodeBlock,
   extends: DefaultTheme,
   Layout: () => {
     const props: Record<string, any> = {}
@@ -55,7 +57,7 @@ export default {
        */
       'nav-bar-title-after': () => h(MNavVisitor),
       'doc-after': () => h(MDocFooter),
-      'aside-bottom': () => h(MAsideSponsors)
+      'aside-bottom': () => h(MAsideSponsors),
     })
   },
   enhanceApp({ app, router }: EnhanceAppContext) {
@@ -64,15 +66,16 @@ export default {
     app.component('MNavLinks', MNavLinks)
 
     app.provide('DEV', process.env.NODE_ENV === 'development')
+    // app.component('CodeBlock', CodeBlock)
 
     if (typeof window !== 'undefined') {
       watch(
         () => router.route.data.relativePath,
         () => updateHomePageStyle(location.pathname === '/'),
-        { immediate: true }
+        { immediate: true },
       )
     }
-  }
+  },
 }
 
 if (typeof window !== 'undefined') {
