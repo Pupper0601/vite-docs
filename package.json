@@ -20,7 +20,9 @@
     "build": "vitepress build docs",
     "build:github": "cross-env APP_BASE_PATH=/mm-notes/ npm run build",
     "lint": "prettier --write .",
-    "prepare": "husky install"
+    "prepare": "husky install",
+    "predev": "npx tsx ./docs/.vitepress/theme/js/index.ts",
+    "prebuild": "npx tsx ./docs/.vitepress/theme/js/index.ts"
   },
   "devDependencies": {
     "@femm/prettier": "^1.1.0",
@@ -40,9 +42,5 @@
       "prettier --write"
     ]
   },
-  "prettier": "@femm/prettier",
-  "dependencies": {
-    "@femm/verify-commit": "^1.0.1",
-    "husky": "^9.0.11"
-  }
+  "prettier": "@femm/prettier"
 }

@@ -110,3 +110,13 @@ table {
 .dark .vp-doc .custom-block a {
   transition: color 0.25s;
 }
+
+.box .link-text .link-text-value {
+  color: var(--vp-button-brand-bg);
+}
+
+@for $i from 0 through 5 {
+  .VPSidebarItem.level-#{$i}.is-active > .item .link > .text[data-v] {
+    color: var(--vp-c-brand-1);
+  }
+}

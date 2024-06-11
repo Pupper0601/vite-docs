@@ -1,4 +1,5 @@
 <script setup lang="ts">
+
 import { computed } from 'vue'
 import { slugify } from '@mdit-vue/shared'
 
@@ -27,6 +28,7 @@ const formatTitle = computed(() => {
 </template>
 
 <style lang="scss" scoped>
+
 .m-nav-links {
   --m-nav-gap: 10px;
   display: grid;
@@ -51,4 +53,5 @@ const formatTitle = computed(() => {
     --m-nav-gap: 20px;
   }
 }
+
 </style>

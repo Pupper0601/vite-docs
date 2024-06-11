@@ -1,27 +1,41 @@
 import type { DefaultTheme } from 'vitepress'
 
 export const nav: DefaultTheme.Config['nav'] = [
-  { text: '导航', link: '/nav', activeMatch: '^/nav' },
+  { text: '导航', link: '/00.导航/nav', activeMatch: '^/nav' },
   {
     text: '编程基础',
     items: [
-      { text: 'Python', link: '/100-Python/1-对象与变量.md' },
-      { text: 'Java', link: '/130-Java/1-环境搭建.md' },
-      { text: 'Linux', link: '/160-Linux/Linux常用命令.md' },
+      {
+        text: '',
+        items: [{ text: 'Python', link: '/01.编程语言/01.Python/01.对象与变量.md' }],
+      },
+      {
+        text: '',
+        items: [{ text: 'Java', link: '/01.编程语言/05.Java/01.环境搭建.md' }],
+      },
+      {
+        text: '',
+        items: [{ text: 'Linux', link: '/01.编程语言/07.Linux/Linux常用命令.md' }],
+      },
     ],
   },
   {
     text: '前端技术',
     items: [
-      { text: 'HTML5', link: '/410-HTML/3-常用标签详解.md' },
-      { text: 'CSS3', link: '/420-CSS3/1-选择器.md' },
       {
-        text: 'JavaScript',
-        link: '/430-JavaScript/1-输入输出、数据类型与转换.md',
+        text: '',
+        items: [
+          { text: 'HTML5', link: '/04.前端技术/01.HTML5/01.常用标签详解.md' },
+          { text: 'CSS3', link: '/04.前端技术/02.CSS3/01.选择器.md' },
+          {
+            text: 'JavaScript',
+            link: '/04.前端技术/03.JavaScript/01.输入输出、数据类型与转换.md',
+          },
+        ],
       },
       {
         text: 'Vue3',
-        link: '/440-Vue3/1-VUE基础.md',
+        link: '/04.前端技术/04.Vue3/01.VUE基础.md',
       },
     ],
   },
@@ -29,51 +43,62 @@ export const nav: DefaultTheme.Config['nav'] = [
     text: '软件测试',
     items: [
       {
-        text: '自动化测试',
+        text: '',
         items: [
           {
             text: '接口自动化',
-            link: '/210-接口自动化/1-HTTP协议解读.md',
+            link: '/02.软件测试/01.接口自动化/01.HTTP协议解读.md',
           },
           {
             text: 'Web自动化',
-            link: '/220-Web自动化/1-Selenium元素定位.md',
+            link: '/02.软件测试/02.Web自动化/01.Selenium元素定位.md',
           },
           {
             text: 'APP自动化',
-            link: '/230-APP自动化/10-Appium环境搭建.md',
+            link: '/02.软件测试/03.APP自动化/01.Appium环境搭建.md',
           },
         ],
       },
       {
-        text: '测试开发',
+        text: '',
         items: [
           {
             text: '测试工具开发',
-            link: '/310-测试工具开发/1-Python知识点回顾.md',
+            link: '/03.测试开发/01.测试工具开发/01.Python知识点回顾.md',
           },
           {
             text: 'Django框架技术',
-            link: '/320-Django框架技术/1-Django入门.md',
+            link: '/03.测试开发/02.Django框架技术/01.Django入门.md',
           },
           {
             text: '测试平台实践',
-            link: '/330-测试平台实战/1-httprunner入门.md',
+            link: '/03.测试开发/03.测试平台实战/01.httprunner入门.md',
           },
         ],
       },
       {
         text: '性能测试',
-        link: '/380-性能测试/1-概述.md',
+        link: '/02.软件测试/04.性能测试/01.概述.md',
       },
     ],
   },
   {
     text: '零散知识',
-    link: '/700-零散知识/',
+    link: '/05.零散知识/01.MAC中Jmeter向python脚本传参.md',
+  },
+  {
+    text: '常用工具',
+    link: '/06.常用工具/服务器连接软件FinalShell.md',
   },
   {
     text: '密文',
-    link: '/969-加密文章/加密文章测试.md',
+    link: '/99.加密文章/加密文章测试.md',
+  },
+  {
+    text: '关于',
+    items: [
+      { text: '分类', link: '/pages/archives.md' },
+      { text: '标签', link: '/pages/tags.md' },
+    ],
   },
 ]

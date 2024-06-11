@@ -1,7 +1,7 @@
 div[class*='language-']:after {
   position: absolute;
   top: 0.6rem;
-  left: 0.7rem;
+  left: 0.8rem;
   height: 0.8rem;
   width: 0.8rem;
   border-radius: 9999px;
@@ -14,7 +14,7 @@ div[class*='language-']:after {
 
 .vp-doc .line-numbers-wrapper,
 .vp-doc .line-numbers-mode .vp-code {
-  margin: 35px 0 10px;
+  margin: 40px 0 10px;
   padding: 0;
 }
 
