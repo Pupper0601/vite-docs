@@ -15,29 +15,31 @@ updated: '2024-03-07 15:26:23'
 
 # 废话前言
 
-{% folding blue, 无用的废话, 可看可不看 %}
-- 我的个人博客是通过 Github 的 Pages 技术搭建的静态博客，使用 {% span red, Hexo %} 驱动。
-- 由于 Github 在国内环境访问速度慢，并且不够稳定，所以通常对外介绍使用 Gitee 的镜像博客仓库，但是每次都需要在推送 Github 之后去 Gitee 上对应的仓库进行 {% span red, 手动同步 %}，就无端增加了很多重复的工作量.
+::: info 无用的废话, 可看可不看
+- 我的个人博客是通过 Github 的 Pages 技术搭建的静态博客，使用 `Hexo` 驱动。
+- 由于 Github 在国内环境访问速度慢，并且不够稳定，所以通常对外介绍使用 Gitee 的镜像博客仓库，但是每次都需要在推送 Github 之后去 Gitee 上对应的仓库进行 `手动同步`，就无端增加了很多重复的工作量.
 - 经过多方搜索和实践，最终选定了 `Github Actions` 实现代码自动Build，同步到Gitee.
-{% endfolding %}
+
+:::
 
 # 关联教程
-{% link github 自动同步到 gitee 镜像库 , 通过`Github Actions` 实现代码自动Build，同步到Gitee , https://pupper.cn/posts/63dde67f.html %}
+
+[github 自动同步到 gitee 镜像库 , 通过`Github Actions` 实现代码自动Build，同步到Gitee](https://pupper.cn/posts/63dde67f.html)
 
 # 一、本地公钥和私钥
 
 ## 1. 生成
 
-在 **本地终端** 输入以下代码 (*邮箱换为自己的*),不要犹豫,一路 {% kbd Enter %} 即可, 出现下图即表示成功
+在 **本地终端** 输入以下代码 (*邮箱换为自己的*),不要犹豫,一路 _Enter_ 即可, 出现下图即表示成功
 
 ```bash
 ssh-keygen -t rsa -C "pupper.cheng@gmail.com"
 ```
 ![](https://img.pupper.cn/img/1709712535.png)
 
-{% tip ban🔴 %}
+::: tip
 如果已经有了 **私钥** **公钥**,可能不会有上图的效果.
-{% endtip %}
+:::
 
 ## 2. 验证
 
@@ -64,35 +66,35 @@ cat ~/.ssh/id_rsa.pub
 
 ## 2. 给 Gitee 添加公钥
 
-{% link Gitee , 添加公钥入口 , https://gitee.com/profile/sshkeys %}
+[Gitee , 添加公钥入口](https://gitee.com/profile/sshkeys)
 
-{% tip info %}
+::: info
 点击个人头像 设置 --> SSH公钥 --> 标题(随便填) --> 公钥(上一步获取的公钥)
-{% endtip %}
+:::
 
 ![](https://img.pupper.cn/img/1709713626.png)
 
 ## 3. 给 GitHub 添加公钥
 
-<!-- {% link title,description,link %} -->
-{% link Github , Github 添加公钥入口 , https://github.com/settings/ssh/new %}
+[Github , Github 添加公钥入口](https://github.com/settings/ssh/new)
 
-{% tip info %}
+::: tip
 - 点击个人头像 设置 --> SSH与GPG公钥 --> 新建SSH秘钥 --> 标题(随便填) --> 公钥(上一步获取的公钥)
 - 点击个人头像 Settings --> SSH and GPG keys --> New SSH key --> 标题(随便填) --> 公钥(上一步获取的公钥)
-{% endtip %}
 
-{% gallery %}
+:::
+
+::: info
 ![](https://img.pupper.cn/img/1709714350.png)
 ![](https://img.pupper.cn/img/1709714441.png)
 ![](https://img.pupper.cn/img/1709714527.png)
-{% endgallery %}
+:::
 
-{% tip warning faa-horizontal animated %}
+::: warning
 什么,想知道我的 GitHub 为什么是中文🥺, 油猴:monkey_face: 了解以下🤪
-{% endtip %}
+:::
 
-{% link GitHub 中文版插件 , 油猴配合中文版脚本可以让你更好的浏览 Github , https://pupper.cn/posts/c247617f.html %}
+[GitHub 中文版插件 , 油猴配合中文版脚本可以让你更好的浏览 Github](https://pupper.cn/posts/c247617f.html)
 
 ## 4. 验证公钥是否添加成功
 
@@ -119,15 +121,16 @@ ssh -T git@gitee.com
 
 ## 2. 给源码仓库设置私钥
 
-{% tip info %}
+::: info
 - 源码仓库 设置 --> 机密和变量 --> 操作 --> 标题(需要记住) --> 私钥(上一步获取的私钥)
 - 源码仓库 Settings --> Secrets and variables --> Actions --> Name(需要记住) --> Secret(上一步获取的私钥)
-{% endtip %}
 
-{% gallery %}
+:::
+
+::: info
 ![](https://img.pupper.cn/img/1709790880.png)
 ![](https://img.pupper.cn/img/1709791034.png)
-{% endgallery %}
+:::
 
 # 四、Gitee 创建镜像库
 
@@ -158,7 +161,7 @@ ssh -T git@gitee.com
 ```
 以下是我的配置文件, 仅供参考你
 
-{% folding green, .github/workflows/autodeploy.yml %}
+::: details .github/workflows/autodeploy.yml
  
 ```yaml
 name: 自动部署
@@ -243,7 +246,7 @@ jobs: # 工作流
           # 注意替换为你的 Gitee 目标仓库地址
           destination-repo: git@gitee.com:pupper/Pupper0601.github.io.git
 ```
-{% endfolding %}
+:::
 
 # 六、现在可以提交代码试试了(*^▽^*)
 

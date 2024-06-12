@@ -155,10 +155,8 @@ def get_config(section: str):
 
 # 发送邮件
 
-{% tabs 发送邮件 %}
-
-<!-- tab 发送程序 -->
-```Python
+::: code-group
+``` Python [发送程序]
 import json
 
 import yagmail
@@ -228,10 +226,8 @@ if __name__ == "__main__":
     }
     SendEmail("测试邮件", datas)
 ```
-<!-- endtab -->
 
-<!-- tab  html 模板 -->
-```html 
+```Python [html 模板]
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -281,13 +277,9 @@ if __name__ == "__main__":
 </body>
 </html>
 ```
-<!-- endtab -->
+:::
 
-<!-- tab 效果图 -->
 ![](https://img.pupper.cn/img/1711442381.png)
-<!-- endtab -->
-
-{% endtabs %}
 
 # 发送企业微信
 

@@ -18,8 +18,8 @@ main_color: '#61584d'
 
 # Gitkraken 最新版v9.x全平台破解教程
 
-{% link Gitkraken 简体中文, 中文翻译 - github,https://github.com/Pupper0601/GitKraken-zh %}
-{% link Gitkraken 简体中文, 中文翻译 - 本站,https://pupper.cn/posts/26ce11d3.html %}
+[Gitkraken 简体中文, 中文翻译 - github](https://github.com/Pupper0601/GitKraken-zh)
+[% link Gitkraken 简体中文, 中文翻译 - 本站](https://pupper.cn/posts/26ce11d3.html)
 
 ## 一、 免责声明
 

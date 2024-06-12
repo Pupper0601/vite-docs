@@ -15,8 +15,8 @@ main_color: '#373948'
 
 # GitKraken 简体中文
 
-{% link Gitkraken 简体中文, 中文翻译 - github,https://github.com/Pupper0601/GitKraken-zh %}
-{% link Gitkraken 最新破解方法, 目前测试 9.7.1 有效,https://pupper.cn/posts/ebfb7201.html %}
+[Gitkraken 简体中文, 中文翻译 - github](https://github.com/Pupper0601/GitKraken-zh)
+[Gitkraken 最新破解方法, 目前测试 9.7.1 有效](https://pupper.cn/posts/ebfb7201.html)
 
 > [个人主页：](https://pupper.cn) 欢迎👏各位大佬访问。
 > 

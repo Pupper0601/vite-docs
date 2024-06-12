@@ -12,7 +12,7 @@ update: '2023-08-01 03:35:54'
 main_color: '#97706e'
 ---
 
-{% link SwitchHosts , 解决连接 github 不稳定的问题 , https://github.com/oldj/SwitchHosts/releases %}
+[SwitchHosts , 解决连接 github 不稳定的问题](https://github.com/oldj/SwitchHosts/releases)
 
 ## 新增
 1. 点击新增，选择远程，将下面的URL粘贴上去
