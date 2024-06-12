@@ -1,6 +1,6 @@
 div[class*='language-']:after {
   position: absolute;
-  top: 0.6rem;
+  top: 0.7rem;
   left: 0.8rem;
   height: 0.8rem;
   width: 0.8rem;
@@ -14,7 +14,7 @@ div[class*='language-']:after {
 
 .vp-doc .line-numbers-wrapper,
 .vp-doc .line-numbers-mode .vp-code {
-  margin: 40px 0 10px;
+  margin: 40px 0 20px;
   padding: 0;
 }
 
@@ -32,7 +32,7 @@ div[class*='language-']:after {
 .vp-doc [class*='language-'] > span.lang {
   position: absolute;
   z-index: 3;
-  top: 0.3em;
+  top: 0.2em;
   left: 4.7rem;
   font-size: 1.15em;
   color: rgba(238, 255, 255, 0.8);
