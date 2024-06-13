@@ -1,0 +1,84 @@
+:root {
+  --shiki-light: #c9d5d6;
+}
+
+:root {
+  --vp-icon-copy: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23C9D5D6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E");
+  --vp-icon-copied: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='%23C9D5D6' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3Cpath d='m9 14 2 2 4-4'/%3E%3C/svg%3E");
+}
+
+.custom-block {
+  &.info {
+    border-color: var(--vp-c-gray-1);
+    color: var(--vp-c-gray-2);
+    background-color: var(--vp-c-gray-soft);
+  }
+  &.tip {
+    border-color: var(--vp-c-indigo-1);
+    color: var(--vp-c-indigo-2);
+    background-color: var(--vp-c-tip-soft);
+    &.custom-block-title {
+      color: var(--vp-c-indigo-2);
+    }
+  }
+  &.warning {
+    border-color: var(--vp-c-yellow-1);
+    color: var(--vp-c-yellow-2);
+    background-color: var(--vp-c-yellow-soft);
+  }
+  &.danger {
+    border-color: var(--vp-c-red-1);
+    color: var(--vp-c-red-2);
+    background-color: var(--vp-c-red-soft);
+  }
+  .custom-block-title {
+    padding-left: 30px;
+  }
+  p:first-of-type ~ p {
+    color: #1c1e21;
+  }
+}
+.info {
+  .custom-block-title {
+    &:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cg fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Ccircle cx='12' cy='12' r='9'/%3E%3Cpath d='M12 8h.01M11 12h1v4h1'/%3E%3C/g%3E%3C/svg%3E");
+      display: block;
+      width: 24px;
+      position: absolute;
+      transform: translateX(-130%);
+    }
+  }
+}
+.tip {
+  .custom-block-title {
+    &:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M4 6.748a2.25 2.25 0 0 1 2.25-2.25h9a2.25 2.25 0 0 1 2.25 2.25V21.25a.75.75 0 0 1-1.127.648l-5.623-3.28-5.622 3.28A.75.75 0 0 1 4 21.25V6.748zm2.25-.75a.75.75 0 0 0-.75.75v13.196l4.873-2.842a.75.75 0 0 1 .755 0l4.873 2.842V6.748a.75.75 0 0 0-.75-.75h-9zm9-3.998A4.75 4.75 0 0 1 20 6.75v11.873a.75.75 0 0 1-1.5 0V6.751a3.25 3.25 0 0 0-3.25-3.25H6.637s.113-.558.797-1.082C8 2 8.602 2 8.602 2h6.648z' fill='%233a5ccc' /%3E%3C/svg%3E");
+      display: block;
+      width: 24px;
+      position: absolute;
+      transform: translateX(-130%);
+    }
+  }
+}
+.warning {
+  .custom-block-title {
+    &:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'%3E%3Cpath d='M85.57 446.25h340.86a32 32 0 0 0 28.17-47.17L284.18 82.58c-12.09-22.44-44.27-22.44-56.36 0L57.4 399.08a32 32 0 0 0 28.17 47.17z' fill='none' stroke='%23946300' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'/%3E%3Cpath d='M250.26 195.39l5.74 122 5.73-121.95a5.74 5.74 0 0 0-5.79-6 5.74 5.74 0 0 0-5.68 5.95z' fill='none' stroke='%23946300' stroke-linecap='round' stroke-linejoin='round' stroke-width='32'/%3E%3Cpath d='M256 397.25a20 20 0 1 1 20-20 20 20 0 0 1-20 20z' fill='%23946300'/%3E%3C/svg%3E");
+      display: block;
+      width: 24px;
+      position: absolute;
+      transform: translateX(-130%);
+    }
+  }
+}
+.danger {
+  .custom-block-title {
+    &:before {
+      content: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M15.73 3H8.27L3 8.27v7.46L8.27 21h7.46L21 15.73V8.27L15.73 3zM19 14.9L14.9 19H9.1L5 14.9V9.1L9.1 5h5.8L19 9.1v5.8zm-4.17-7.14L12 10.59 9.17 7.76 7.76 9.17 10.59 12l-2.83 2.83 1.41 1.41L12 13.41l2.83 2.83 1.41-1.41L13.41 12l2.83-2.83-1.41-1.41z' fill='%23d5393e'/%3E%3C/svg%3E");
+      display: block;
+      width: 24px;
+      position: absolute;
+      transform: translateX(-130%);
+    }
+  }
+}
